@@ -1,1 +1,4 @@
-# central
+# Central 
+
+Distributes games among available agents.
+
