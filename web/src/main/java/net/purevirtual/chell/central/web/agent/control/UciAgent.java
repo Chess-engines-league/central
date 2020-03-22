@@ -12,7 +12,7 @@ public class UciAgent {
     private static final Logger logger = LoggerFactory.getLogger(UciAgent.class);
     private final AgentInput remote;
     private State state;
-    // maybe optional or normal variables instead of lists?
+    // FIXME: maybe optional or normal variables instead of lists?
     private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
     private List<CompletableFuture<String>> moveFutures = new ArrayList<>();
     private LocalDateTime lastMessage = null;

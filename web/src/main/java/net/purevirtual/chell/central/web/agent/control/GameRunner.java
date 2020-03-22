@@ -1,8 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
 import com.github.bhlangonijr.chesslib.Board;
-import com.github.bhlangonijr.chesslib.Side;
-import com.github.bhlangonijr.chesslib.move.Move;
 import com.github.bhlangonijr.chesslib.move.MoveConversionException;
 import com.github.bhlangonijr.chesslib.move.MoveGenerator;
 import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
@@ -83,15 +81,15 @@ public class GameRunner {
         String fen = list.getFen();
         Board board = new Board();
         board.loadFromFen(fen);
-        logger.info("fen: \n" + fen);
-        logger.info("state\n" + board.toString());
+        logger.info("fen: {}", fen);
+        logger.info("state\n{}", board.toString());
         logger.info("draw={}, InsufficientMaterial={}, KingAttacked={}, mated={}, stalemate={}",
                 board.isDraw(), board.isInsufficientMaterial(), board.isKingAttacked(), board.isMated(), board.isStaleMate());
         if (board.isDraw() || board.isStaleMate()) {
             return Optional.of("DRAW");
         }
         if (board.isMated()) {
-            logger.info("returning {}", side.name());
+            logger.info("returning {}", side);
             return Optional.of(side.name());
         }
         return Optional.empty();
@@ -106,8 +104,9 @@ public class GameRunner {
             String fen = list.getFen();
             board.loadFromFen(fen);
         }
-        MoveList moves = MoveGenerator.generateLegalMoves(board);
-        return moves.stream().anyMatch((move1) -> (move.equals(move1.toString())));
+        return MoveGenerator.generateLegalMoves(board)
+                .stream()
+                .anyMatch(legal -> move.equals(legal.toString()));
     }
     
     enum Side {
@@ -122,16 +121,4 @@ public class GameRunner {
         }
     }
 
-    //TODO: verify if the move was legal
-//                MoveList list = new MoveList();
-//                list.loadFromText(game.getMovesString());
-//                String fen = list.getFen();
-//                Board board = new Board();
-//                board.isKingAttacked();
-//                board.loadFromFen(fen);
-//                boolean moveLegal = board.isMoveLegal(mov, true);
-//                if(!moveLegal) {
-//                    logger.info("white attempted illegal move {}, black wins", move);
-//                    game.setResult("0");
-//                }
 }
