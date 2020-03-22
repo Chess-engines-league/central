@@ -27,6 +27,10 @@ public class Game {
     public List<String> getMoves() {
         return moves;
     }
+    
+    public String getMovesString() {
+        return String.join(" ", moves);
+    }
 
     public UciAgent getWhite() {
         return white;

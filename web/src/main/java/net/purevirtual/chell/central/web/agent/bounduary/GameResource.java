@@ -22,7 +22,7 @@ public class GameResource {
     private GameRunner gameRunner;
 
     @GET
-    @Produces(value = MediaType.APPLICATION_JSON)
+    @Produces(value = MediaType.TEXT_PLAIN)
     @Path("new/{white}/{black}")
     public String newGame(@PathParam("white") String white, @PathParam("black") String black) {
         UciAgent whiteAgent = agentsManager.get(white);
@@ -33,7 +33,7 @@ public class GameResource {
     }
     
     @GET
-    @Produces(value = MediaType.APPLICATION_JSON)
+    @Produces(value = MediaType.TEXT_PLAIN)
     @Path("new/random")
     public String randomGame() {
         List<String> list = agentsManager.list();

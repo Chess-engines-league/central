@@ -24,20 +24,16 @@ import org.slf4j.LoggerFactory;
 public class WebSocket {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocket.class);
-    private Session session;
     private UciAgent uciAgent;
     private static Set<WebSocket> chatEndpoints
             = new CopyOnWriteArraySet<>();
-    private static HashMap<String, String> users = new HashMap<>();
     @Inject
-    AgentsManager agentsManager;
+    private AgentsManager agentsManager;
 
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username) throws IOException {
 
-        this.session = session;
         chatEndpoints.add(this);
-        users.put(session.getId(), username);
         logger.info("connected: " + username);
         WsAgentInput wsAgentInput = new WsAgentInput(session.getAsyncRemote());
         uciAgent = new UciAgent(wsAgentInput);
@@ -47,7 +43,7 @@ public class WebSocket {
     @OnMessage
     public void onMessage(Session session, String message)
             throws IOException {
-        logger.info("Got message: '{}', handing to agent {}", message.trim(), session.getId());
+        logger.debug("Got message: '{}', handing to agent {}", message.trim(), session.getId());
         uciAgent.onMessage(message);
     }
 

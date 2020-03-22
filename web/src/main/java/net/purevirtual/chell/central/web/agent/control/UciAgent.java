@@ -21,14 +21,14 @@ public class UciAgent {
         remote.send("uci");
     }
     
-    public Future<String>  move(List<String> movesSoFar) {
+    public Future<String>  move(List<String> movesSoFar, long moveTimeLimit) {
         state=State.WAIT_FOR_MOVE;
         if (movesSoFar.isEmpty()) {
             remote.send("position startpos");
         } else {
             remote.send("position startpos moves " + String.join(" ", movesSoFar));
         }
-        remote.send("go movetime 1500");
+        remote.send("go movetime "+moveTimeLimit);
         CompletableFuture<String> moveFuture = new CompletableFuture<>();
         moveFutures.add(moveFuture);
         return moveFuture;
@@ -41,13 +41,16 @@ public class UciAgent {
         }
         String cmd = parts[0];
         switch (cmd) {
-            case "bestmove": {
+            case "bestmove":
                 String move = parts[1];
                 // TODO: make this configurable
-                remote.send("ponder");
-                moveFutures.forEach(f->f.complete(move));
-            }
-            break;
+                //remote.send("go ponder");
+                moveFutures.forEach(f -> f.complete(move));
+                moveFutures.clear();
+                break;
+            case "info":
+                logger.debug(message);
+                break;
             case "uciok":
                 state = State.WAIT_FOR_READY_OK;
                 remote.send("ucinewgame", "isready");
