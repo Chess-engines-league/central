@@ -10,6 +10,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+
+        <sonar.projectKey>Chess-engines-league_central</sonar.projectKey>
+        <sonar.organization>chess-engines-league</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.login>9f1a29897f2978f26f1b65076147a2e267e5238c</sonar.login>
     </properties>
     <repositories>
         <repository>
@@ -25,4 +30,16 @@
     <modules>
         <module>web</module>
     </modules>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>3.7.0.1746</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
 </project>

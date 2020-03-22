@@ -92,7 +92,7 @@ public class GameRunner {
         }
         if (board.isMated()) {
             logger.info("returning {}", side.name());
-            Optional.of(side.name());
+            return Optional.of(side.name());
         }
         return Optional.empty();
     }
