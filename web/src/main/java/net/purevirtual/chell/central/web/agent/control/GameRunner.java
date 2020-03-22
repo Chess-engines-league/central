@@ -23,12 +23,17 @@ public class GameRunner {
     private static final Logger logger = LoggerFactory.getLogger(GameRunner.class);
 
     public void run(Game game) {
-        String result = runInternal(game);
-        logger.info("game done, result {}", result);
-        game.setResult(result);
+        try {
+            String result = runInternal(game);
+            logger.info("game done, result {}", result);
+            game.setResult(result);
+        } catch (InterruptedException ex) {
+            logger.error("Game execution was interrupted", ex);
+            Thread.currentThread().interrupt();
+        }
     }
 
-    private String runInternal(Game game) {
+    private String runInternal(Game game) throws InterruptedException {
         try {
             logger.info("reseting agents");
             long moveLimit = 500;
@@ -48,7 +53,7 @@ public class GameRunner {
                 }
             }
 
-        } catch (InterruptedException | ExecutionException | MoveConversionException |MoveGeneratorException ex) {
+        } catch (ExecutionException | MoveConversionException |MoveGeneratorException ex) {
             logger.error("Game failed to complete", ex);
             return "ERROR";
         }
@@ -56,14 +61,14 @@ public class GameRunner {
         return "ERROR";
     }
     
-    private Optional<String> halfMove(Game game, UciAgent agent, long moveLimit, Side side) throws ExecutionException, InterruptedException, MoveConversionException, MoveGeneratorException {
+    private Optional<String> halfMove(Game game, UciAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
         logger.info("{} start a move", side);
         Future<String> moveFuture = agent.move(game.getMoves(), moveLimit);
         String move;
         try {
             move = moveFuture.get(2 * moveLimit, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException ex) {
-            logger.info("{} failed to move in allowed time", side);
+        } catch (TimeoutException|ExecutionException ex) {
+            logger.info("{} failed to return move in allowed time", side);
             return Optional.of(side.opponent().name());
         }
         if (!isLegal(game.getMovesString(), move)) {
@@ -82,7 +87,8 @@ public class GameRunner {
         Board board = new Board();
         board.loadFromFen(fen);
         logger.info("fen: {}", fen);
-        logger.info("state\n{}", board.toString());
+        
+        logger.info("state\n{}", board);
         logger.info("draw={}, InsufficientMaterial={}, KingAttacked={}, mated={}, stalemate={}",
                 board.isDraw(), board.isInsufficientMaterial(), board.isKingAttacked(), board.isMated(), board.isStaleMate());
         if (board.isDraw() || board.isStaleMate()) {

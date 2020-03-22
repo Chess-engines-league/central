@@ -70,9 +70,9 @@ public class UciAgent {
                 break;
             default:
                 if (state == State.WAIT_FOR_UCI_OK) {
-                    logger.info("uci options : " + message);
+                    logger.info("uci options : {}" , message);
                 } else {
-                    logger.info("unknown option : " + message);
+                    logger.info("unknown option : {}", message);
                 }
 
                 break;
