@@ -32,7 +32,6 @@ public class WebSocket {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("username") String username) throws IOException {
-
         chatEndpoints.add(this);
         logger.info("connected: " + username);
         WsAgentInput wsAgentInput = new WsAgentInput(session.getAsyncRemote());

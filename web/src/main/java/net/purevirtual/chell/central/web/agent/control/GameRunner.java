@@ -91,6 +91,7 @@ public class GameRunner {
             return Optional.of("DRAW");
         }
         if (board.isMated()) {
+            logger.info("returning {}", side.name());
             Optional.of(side.name());
         }
         return Optional.empty();

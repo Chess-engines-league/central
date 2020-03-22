@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,11 +15,17 @@ public class UciAgent {
     // maybe optional or normal variables instead of lists?
     private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
     private List<CompletableFuture<String>> moveFutures = new ArrayList<>();
-
+    private LocalDateTime lastMessage = null;
     public UciAgent(AgentInput remote) {
         this.remote = remote;
         state = State.WAIT_FOR_UCI_OK;
         remote.send("uci");
+    }
+    
+    public void heartbeat(int seconds) {
+        if (lastMessage== null ||lastMessage.plusSeconds(seconds).isBefore(LocalDateTime.now())) {
+            remote.heartbeat();
+        }
     }
     
     public Future<String>  move(List<String> movesSoFar, long moveTimeLimit) {
