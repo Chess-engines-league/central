@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
+import net.purevirtual.chell.central.web.agent.entity.LiveGame;
+import net.purevirtual.chell.central.web.crud.entity.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +16,16 @@ public class UciAgent {
     private static final Logger logger = LoggerFactory.getLogger(UciAgent.class);
     private final AgentInput remote;
     private State state;
+    private Agent agentEntity;
+    private final ReentrantLock mutex = new ReentrantLock();
+    private LiveGame liveGame;
     // FIXME: maybe optional or normal variables instead of lists?
     private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
     private List<CompletableFuture<String>> moveFutures = new ArrayList<>();
     private LocalDateTime lastMessage = null;
-    public UciAgent(AgentInput remote) {
+    public UciAgent(AgentInput remote, Agent agentEntity) {
         this.remote = remote;
+        this.agentEntity = agentEntity;
         state = State.WAIT_FOR_UCI_OK;
         remote.send("uci");
     }
@@ -59,6 +67,14 @@ public class UciAgent {
                 logger.debug(message);
                 break;
             case "uciok":
+                if (agentEntity.getInitOptions() != null) {
+                    for (String option : agentEntity.getInitOptions().split("\\R")) {
+                        String trimmed = option.trim();
+                        if (!trimmed.isEmpty()) {
+                            remote.send(trimmed);
+                        }
+                    }
+                }
                 state = State.WAIT_FOR_READY_OK;
                 remote.send("ucinewgame", "isready");
 
@@ -86,6 +102,24 @@ public class UciAgent {
         readyFutures.add(readyFuture);
         return readyFuture;
         
+    }
+
+    public Agent getAgentEntity() {
+        return agentEntity;
+    }
+
+    public synchronized boolean assignGame(LiveGame game) throws InterruptedException {
+        if (this.liveGame != null) {
+            return false;
+        }
+        this.liveGame = game;
+        return true;
+    }
+
+    public synchronized void release(LiveGame game) {
+        if (this.liveGame == game) {
+            this.liveGame = null;
+        }
     }
 
     enum State {

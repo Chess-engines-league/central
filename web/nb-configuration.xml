@@ -22,5 +22,9 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>120</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapProperties>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapProperties>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInit>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInit>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInitItems>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInitItems>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapObjects>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapObjects>
     </properties>
 </project-shared-configuration>
