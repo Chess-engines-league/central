@@ -18,8 +18,8 @@ public class MatchManager {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Agent get(Integer id) {
-        return entityManager.find(Agent.class, id);
+    public Match get(Integer id) {
+        return entityManager.find(Match.class, id);
     }
 
     public Match save(Match match) {
@@ -30,6 +30,11 @@ public class MatchManager {
     public List<Match> findUnfinished() {
         return entityManager.createQuery("select distinct m from Match m  join FETCH m.games where m.state=:state", Match.class)
                 .setParameter("state", MatchState.PENDING)
+                .getResultList();
+    }
+
+    public List<Match> findAll() {
+        return entityManager.createQuery("select m from Match m order by m.id desc", Match.class)
                 .getResultList();
     }
 

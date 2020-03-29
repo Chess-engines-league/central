@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.Game;
+import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,17 @@ public class GameManager {
                 .setParameter("id", game.getId())
                 .setParameter("result", gameResult)
                 .executeUpdate();    
+    }
+
+    public List<Game> findByMatch(Match match) {
+        return entityManager.createQuery("select g from Game g where g.match = :match order by g.gameNumber", Game.class)
+                .setParameter("match", match)
+                .getResultList();
+    }
+    
+    public List<Game> findAll() {
+        return entityManager.createQuery("select g from Game g order by g.id desc", Game.class)
+                .getResultList();
     }
 
 }

@@ -12,6 +12,8 @@ public class GuiRestConfig extends Application {
     public Set<Class<?>> getClasses() {
         HashSet<Class<?>> classes = new HashSet<>();
         classes.add(IndexPage.class);
+        classes.add(MatchPage.class);
+        classes.add(GamePage.class);
         return classes;
     }
 

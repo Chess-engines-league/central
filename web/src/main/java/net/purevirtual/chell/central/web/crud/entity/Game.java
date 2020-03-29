@@ -1,5 +1,8 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -31,6 +34,10 @@ public class Game {
     private String boardState;
     @Enumerated(EnumType.STRING)
     private GameResult result;
+    
+    public List<String> getMoves() {
+        return Stream.of(boardState.split("\\s+")).filter(s -> !s.isBlank()).collect(Collectors.toList());
+    }
 
     public Integer getId() {
         return id;
