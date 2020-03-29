@@ -110,14 +110,17 @@ public class UciAgent {
 
     public synchronized boolean assignGame(LiveGame game) throws InterruptedException {
         if (this.liveGame != null) {
+            logger.info("agent {}: rejecting {}, already busy with game {}", this.agentEntity.getId(), game.getGame().getId(), this.liveGame.getGame().getId());
             return false;
         }
+        logger.info("agent {}: joining game {}", this.agentEntity.getId(), game.getGame().getId());
         this.liveGame = game;
         return true;
     }
 
     public synchronized void release(LiveGame game) {
         if (this.liveGame == game) {
+            logger.info("agent {}: leaving game {}", this.agentEntity.getId(), liveGame.getGame().getId());
             this.liveGame = null;
         }
     }

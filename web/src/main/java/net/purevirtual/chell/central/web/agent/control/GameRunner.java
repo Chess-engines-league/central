@@ -42,13 +42,13 @@ public class GameRunner {
             
             if (!white.assignGame(game)) {
                 logger.info("Cannot start game {} from match {}, the agent {} is busy"
-                        //, game.getId(), match.getId(), match.getAgent1().getId()
+                        , game.getGame().getId(), game.getGame().getMatch().getId(), game.getWhite().getAgentEntity().getId()
                 );
                 return GameResult.PENDING;
             }
             if (!black.assignGame(game)) {
                 logger.info("Cannot start game {} from match {}, the agent {} is busy"
-                        //, game.getId(), match.getId(), match.getAgent2().getId()
+                        , game.getGame().getId(), game.getGame().getMatch().getId(), game.getBlack().getAgentEntity().getId()
                 );
                 return GameResult.PENDING;
             }
@@ -69,7 +69,7 @@ public class GameRunner {
     private GameResult runInternal(LiveGame game) throws InterruptedException {
         try {
             logger.info("reseting agents");
-            long moveLimit = 500;
+            long moveLimit = 1000;
             Future<Void> resetW = game.getWhite().reset();
             Future<Void> resetB = game.getBlack().reset();
             try {
