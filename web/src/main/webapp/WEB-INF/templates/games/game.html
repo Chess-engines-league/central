@@ -12,11 +12,40 @@
     </head>
     <body>
         <div class="container">
-            Gra:
-            <p >ID</p>
-            <p th:text="${game.id}" />
-            <p >Wynik</p>
-            <p th:text="${game.result}" />
+            <table>
+                <tr>
+                    <th>Game ID</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td th:text="${game.id}" />
+                    <td th:text="${game.result}" />
+                </tr>
+            </table>
+            
+            <table>
+                <tr>
+                    <th rowspan="2">Strona</th>
+                    <th colspan="2">gracz/silnik</th>    
+                </tr>
+                <tr>
+                    <th>id</th>
+                    <th>nazwa</th>
+                    <th>opis</th>
+                </tr>
+                <tr>
+                    <td>Białe</td>
+                    <td th:text="${white.id}"/>
+                    <td th:text="${white.name}"/>
+                    <td th:text="${white.description}" />    
+                </tr>
+                <tr>
+                    <td>Czarne</td>
+                    <td th:text="${black.id}"/>
+                    <td th:text="${black.name}"/>
+                    <td th:text="${black.description}" />    
+                </tr>
+            </table>
             <div class="row">
                 <div id="myBoard" class="col-sm-6">
 <!--                    <div " style="width: 400px"></div>-->
