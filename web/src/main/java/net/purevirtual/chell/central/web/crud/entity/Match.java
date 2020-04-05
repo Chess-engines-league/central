@@ -25,12 +25,12 @@ public class Match {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "idagent1")
-    private Agent agent1;
+    @JoinColumn(name = "idplayer1")
+    private EngineConfig player1;
 
     @ManyToOne
-    @JoinColumn(name = "idagent2")
-    private Agent agent2;
+    @JoinColumn(name = "idplayer2")
+    private EngineConfig player2;
     
     @OneToMany(mappedBy = "match")
     @OrderBy("gameNumber ASC")
@@ -49,20 +49,20 @@ public class Match {
         this.id = id;
     }
 
-    public Agent getAgent1() {
-        return agent1;
+    public EngineConfig getPlayer1() {
+        return player1;
     }
 
-    public void setAgent1(Agent agent1) {
-        this.agent1 = agent1;
+    public EngineConfig getPlayer2() {
+        return player2;
     }
 
-    public Agent getAgent2() {
-        return agent2;
+    public void setPlayer1(EngineConfig player1) {
+        this.player1 = player1;
     }
 
-    public void setAgent2(Agent agent2) {
-        this.agent2 = agent2;
+    public void setPlayer2(EngineConfig player2) {
+        this.player2 = player2;
     }
 
     public MatchState getState() {

@@ -1,0 +1,61 @@
+@startuml
+' generate image with http://www.plantuml.com/plantuml/uml/
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+'skinparam linetype ortho
+
+entity "Engine" as engine {
+  *id : number <<generated>>
+  --
+  *name : text
+  description : text
+  type: enum (STOCKFISH/HYBRID)
+}
+
+entity "EngineConfig" as engineconfig {
+  *id : number <<generated>>
+  --
+  description : text
+  elo:  number
+  options: text (key=value list)
+  vote: enum (RANDOM)
+}
+
+entity "Game" as game {
+  *id : number <<generated>>
+  --
+  moves : text
+  result : text
+}
+
+entity "Match" as match {
+  *id : number <<generated>>
+  --
+  idplayer1 : EngineConfig <<FK>>
+  idplayer2 : EngineConfig <<FK>>
+  timePerMove: int
+  timePerGame: int
+  startPosition: text
+}
+
+entity "Tournament" as tour {
+  *id : number <<generated>>
+  --
+  idplayer1 : EngineConfig <<FK>>
+  idplayer2 : EngineConfig <<FK>>
+  timePerMove: int
+  timePerGame: int
+  startPosition: text
+  type: enum RoundRobin/SingleElimination
+}
+
+
+engineconfig }|--|| engine
+tour |o--|{ match
+engineconfig ||--o{ tour : x2
+engineconfig ||--o{ match : x2
+game }|--|| match
+engineconfig }o--|| engineconfig : hybrid subengine
+@enduml

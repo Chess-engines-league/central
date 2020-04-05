@@ -20,8 +20,8 @@ grant usage on "agent_id_seq" to jboss_chell_central;
 
 CREATE TABLE "match" (
     id  SERIAL NOT NULL,
-    idagent1 int NOT null REFERENCES agent (id),
-    idagent2 int NOT null REFERENCES agent (id),
+    idengineconfig int NOT null REFERENCES agent (id),
+    idengineconfig int NOT null REFERENCES agent (id),
     state text  NOT NULL,
     result text,
     gamecount int,
@@ -44,3 +44,13 @@ CREATE TABLE public.game (
 grant select,insert,update on "game" to jboss_chell_central;
 grant usage on "game_id_seq" to jboss_chell_central;
 
+CREATE TABLE public.engineconfig (
+	id serial NOT NULL,
+    idagent int NOT null REFERENCES agent (id),
+	description text NULL,
+	initoptions text NULL,
+    elo int NOT NULL,
+	CONSTRAINT engineconfig_pkey PRIMARY KEY (id)
+);
+grant select,insert on "engineconfig" to jboss_chell_central;
+grant usage on "engineconfig_id_seq" to jboss_chell_central;

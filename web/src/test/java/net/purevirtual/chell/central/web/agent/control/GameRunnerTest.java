@@ -3,11 +3,10 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.ejb.AsyncResult;
-import javax.inject.Inject;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
+import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
-import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +32,13 @@ public class GameRunnerTest {
     private UciAgent white;
     
     @Mock
+    private EngineConfig whiteConfig;
+    
+    @Mock
     private UciAgent black;
+    
+    @Mock
+    private EngineConfig blackConfig;
     
     @Mock
     private GameManager gameManager;
@@ -42,8 +47,8 @@ public class GameRunnerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(white.reset()).thenReturn(new AsyncResult<>(null));
-        when(black.reset()).thenReturn(new AsyncResult<>(null));
+        when(white.reset(any())).thenReturn(new AsyncResult<>(null));
+        when(black.reset(any())).thenReturn(new AsyncResult<>(null));
         
     }
     
@@ -62,11 +67,11 @@ public class GameRunnerTest {
         
         when(white.move(any(), anyLong())).thenReturn(move1, move3);
         when(black.move(any(), anyLong())).thenReturn(move2, move4);
-        when(white.reset()).thenReturn(mockReset);
-        when(black.reset()).thenReturn(mockReset);
+        when(white.reset(any())).thenReturn(mockReset);
+        when(black.reset(any())).thenReturn(mockReset);
         when(white.assignGame(any())).thenReturn(Boolean.TRUE);
         when(black.assignGame(any())).thenReturn(Boolean.TRUE);
-        LiveGame game = new LiveGame(new Game(), white, black, "");
+        LiveGame game = new LiveGame(new Game(), white, black, whiteConfig, blackConfig);
         GameResult result = sut.runSync(game);
         assertTrue(result.equals(GameResult.BLACK));
     }

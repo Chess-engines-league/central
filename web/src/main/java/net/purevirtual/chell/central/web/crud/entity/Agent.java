@@ -2,11 +2,13 @@ package net.purevirtual.chell.central.web.crud.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 
 @Entity
 public class Agent {
@@ -19,8 +21,8 @@ public class Agent {
         
     private String token;
     private String name;
-    private String description;
-    private String initOptions;
+    @Enumerated(EnumType.STRING)
+    private EngineType type;
 
     public Integer getId() {
         return id;
@@ -46,22 +48,12 @@ public class Agent {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public EngineType getType() {
+        return type;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setType(EngineType type) {
+        this.type = type;
     }
-
-    public String getInitOptions() {
-        return initOptions;
-    }
-
-    public void setInitOptions(String initOptions) {
-        this.initOptions = initOptions;
-    }
-    
-    
 
 }

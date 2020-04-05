@@ -70,8 +70,8 @@ public class GameRunner {
         try {
             logger.info("reseting agents");
             long moveLimit = 1000;
-            Future<Void> resetW = game.getWhite().reset();
-            Future<Void> resetB = game.getBlack().reset();
+            Future<Void> resetW = game.getWhite().reset(game.getWhiteConfig());
+            Future<Void> resetB = game.getBlack().reset(game.getBlackConfig());
             try {
                 resetW.get(10, TimeUnit.SECONDS);
             } catch (TimeoutException ex) {

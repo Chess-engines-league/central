@@ -4,7 +4,7 @@ import javax.inject.Inject;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
@@ -18,10 +18,10 @@ public class MatchMaker {
     @Inject
     private GameManager matchgameManager;
 
-    public Match newMatch(Agent agent1, Agent agent2, int gameCount) {
+    public Match newMatch(EngineConfig player1, EngineConfig player2, int gameCount) {
         Match match = new Match();
-        match.setAgent1(agent1);
-        match.setAgent2(agent2);
+        match.setPlayer1(player1);
+        match.setPlayer2(player2);
         match.setGameCount(gameCount);
         match.setResult("");
         match.setState(MatchState.PENDING);

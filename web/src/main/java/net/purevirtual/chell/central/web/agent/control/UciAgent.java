@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,17 +67,9 @@ public class UciAgent {
                 logger.debug(message);
                 break;
             case "uciok":
-                if (agentEntity.getInitOptions() != null) {
-                    for (String option : agentEntity.getInitOptions().split("\\R")) {
-                        String trimmed = option.trim();
-                        if (!trimmed.isEmpty()) {
-                            remote.send(trimmed);
-                        }
-                    }
-                }
+                //sendOptions(engineConfig);
                 state = State.WAIT_FOR_READY_OK;
                 remote.send("ucinewgame", "isready");
-
                 break;
             case "readyok":
                 readyFutures.forEach(f -> f.complete(null));
@@ -95,13 +87,27 @@ public class UciAgent {
         }
     } 
 
-    public Future<Void> reset() {
+    public Future<Void> reset(EngineConfig engineConfig) {
         state = State.WAIT_FOR_READY_OK;
+        sendOptions(engineConfig);
         remote.send("ucinewgame", "isready");
         CompletableFuture<Void> readyFuture = new CompletableFuture<>();
         readyFutures.add(readyFuture);
         return readyFuture;
         
+    }
+    
+    private void sendOptions(EngineConfig engineConfig) {
+        String initOptions = engineConfig.getInitOptions();
+        if (initOptions != null) {
+            logger.info("initing the game engine with options: {}", initOptions);
+            for (String option : initOptions.split("\\R")) {
+                String trimmed = option.trim();
+                if (!trimmed.isEmpty()) {
+                    remote.send(trimmed);
+                }
+            }
+        }
     }
 
     public Agent getAgentEntity() {

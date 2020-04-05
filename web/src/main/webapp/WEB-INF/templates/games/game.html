@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"  xmlns="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+      layout:decorate="~{layout.html}">
     <head>
         <title>Chess Engine League - Central Server</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
         <script src="/static/chessboardjs/js/chessboard-1.0.0.js"></script>
-        <link rel="stylesheet"  href="/static/chessboardjs/css/chessboard-1.0.0.css">
+        <link rel="stylesheet"  href="/static/chessboardjs/css/chessboard-1.0.0.css" />
     </head>
     <body>
-        <div class="container">
+        <div class="container" layout:fragment="content">
             <table>
                 <tr>
                     <th>Game ID</th>
@@ -22,7 +18,7 @@
                     <td th:text="${game.result}" />
                 </tr>
             </table>
-            
+
             <table>
                 <tr>
                     <th rowspan="2">Strona</th>
@@ -30,32 +26,32 @@
                 </tr>
                 <tr>
                     <th>id</th>
-                    <th>nazwa</th>
                     <th>opis</th>
+                    <th>konfiguracja</th>
                 </tr>
                 <tr>
                     <td>Białe</td>
                     <td th:text="${white.id}"/>
-                    <td th:text="${white.name}"/>
+                    <td th:text="${white.agent.name}"/>
                     <td th:text="${white.description}" />    
                 </tr>
                 <tr>
                     <td>Czarne</td>
                     <td th:text="${black.id}"/>
-                    <td th:text="${black.name}"/>
+                    <td th:text="${black.agent.name}"/>
                     <td th:text="${black.description}" />    
                 </tr>
             </table>
             <div class="row">
                 <div id="myBoard" class="col-sm-6">
-<!--                    <div " style="width: 400px"></div>-->
+                    <!--                    <div " style="width: 400px"></div>-->
                 </div>
                 <div class="col-sm-6">
                     <p >Ruchy</p>
                     <p th:text="${game.boardState}" />
                 </div>
             </div>
-            
+
             <div class="row">
                 <div class="col-sm-1">
                     <a href="#" onclick="first();return false">&lt;&lt;</a>
@@ -74,40 +70,43 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-            var fenList = [(${fenList})];
-            //var fenList=["a"];;
-            var currentMove = 1;
-            var board;
-            if (fenList.length>0) {
+        <div class="row" layout:fragment="bonus-script">
+            <script type="text/javascript">
+                var fenList = [(${fenList})];
+                //var fenList=["a"];;
+                var currentMove = 1;
+                var board;
+                if (fenList.length > 0) {
                     board = Chessboard('myBoard', fenList[0]);
-            } else {
+                } else {
                     board = Chessboard('myBoard');
-            }
-            function next() {
-                if (currentMove < fenList.length) {
-                    currentMove++;
                 }
-                board.position(fenList[currentMove-1], false);
-                return false;
-            }
-            function previous() {
-                if (currentMove > 1) {
-                    currentMove--;
+                function next() {
+                    if (currentMove < fenList.length) {
+                        currentMove++;
+                    }
+                    board.position(fenList[currentMove - 1], false);
+                    return false;
                 }
-                board.position(fenList[currentMove-1], false);
-                return false;
-            }
-            function first() {
-                currentMove = 1;
-                board.position(fenList[currentMove-1], false);
-                return false;
-            }
-            function last() {
-                currentMove = fenList.length;
-                board.position(fenList[currentMove-1], false);
-                return false;
-            }
-        </script>
+                function previous() {
+                    if (currentMove > 1) {
+                        currentMove--;
+                    }
+                    board.position(fenList[currentMove - 1], false);
+                    return false;
+                }
+                function first() {
+                    currentMove = 1;
+                    board.position(fenList[currentMove - 1], false);
+                    return false;
+                }
+                function last() {
+                    currentMove = fenList.length;
+                    board.position(fenList[currentMove - 1], false);
+                    return false;
+                }
+
+            </script>
+        </div>
     </body>
 </html>

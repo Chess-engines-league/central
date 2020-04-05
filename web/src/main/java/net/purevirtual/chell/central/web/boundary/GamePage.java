@@ -5,8 +5,6 @@ import com.github.bhlangonijr.chesslib.move.MoveList;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,7 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.WebContext;
@@ -35,13 +33,13 @@ public class GamePage extends PageResource {
     public String get(@PathParam("gameId") int gameId) {
         Game game = gameManager.get(gameId);
         WebContext context = newContext();
-        Agent white,black;
+        EngineConfig white,black;
         if (game.isWhitePlayedByFirstAgent()) {
-            white = game.getMatch().getAgent1();
-            black = game.getMatch().getAgent2();
+            white = game.getMatch().getPlayer1();
+            black = game.getMatch().getPlayer2();
         } else {
-            white = game.getMatch().getAgent1();
-            black = game.getMatch().getAgent2();
+            white = game.getMatch().getPlayer2();
+            black = game.getMatch().getPlayer1();
         }
         
         context.setVariable("game", game);
