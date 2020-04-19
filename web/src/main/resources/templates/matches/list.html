@@ -12,7 +12,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Status</th>
-                    <th>Wynik</th>
+                    <th>Result</th>
                 </tr>
                 <tr th:each="match: ${matches}">
                     <td><a th:href="${'/gui/matches/' + match.id}" th:text="${match.id}"/></td>

@@ -1,7 +1,10 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,7 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 
@@ -30,10 +34,14 @@ public class Engine {
     @Enumerated(EnumType.STRING)
     private EngineType type;
     
+    @OrderBy("id ASC")
+    @OneToMany(mappedBy = "engine", fetch = FetchType.EAGER)
+    private Set<EngineConfig> configs;
+    
     //@OrderColumn(name = "order")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "subengines")
-    private List<EngineConfig> subEngines;
+    private Set<EngineConfig> subEngines;
 
     public Integer getId() {
         return id;
@@ -69,11 +77,16 @@ public class Engine {
 
     public List<EngineConfig> getSubEngines() {
         if (subEngines == null) {
-            subEngines = new ArrayList<>();
+            subEngines = new HashSet<>();
         }
-        return subEngines;
+        ArrayList<EngineConfig> tmp = new ArrayList<>(subEngines);
+        Collections.sort(tmp, (a, b) -> a.getId().compareTo(b.getId()));
+        return tmp;
     }
 
+    public Set<EngineConfig> getConfigs() {
+        return configs;
+    }
     
 
 }

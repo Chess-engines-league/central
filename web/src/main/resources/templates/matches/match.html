@@ -7,21 +7,47 @@
     <body>
         <div th:replace="layout :: navbar"></div>
         <div class="container bg-secondary">
-            Match:
-            <p >ID</p>
-            <p th:text="${match.id}" />
+            Match: <span th:text="${match.id}" />
+            
             <p >Status</p>
             <p th:text="${match.result}" />
+            <table>
+                <tr>
+                    <th>player</th>
+                    <th>engine id</th>
+                    <th>description</th>
+                    <th>config id</th>
+                    <th>configuration</th>
+                </tr>
+                <tr>
+                    <td>Player 1</td>
+                    <td><a th:href="${'/gui/engines/'+ player1.engine.id}" th:text="${player1.engine.id}"/></td>
+                    <td><a th:href="${'/gui/engines/'+ player1.engine.id}" th:text="${player1.engine.name}"/></td>
+                    <td th:text="${player1.id}"/>
+                    <td th:text="${player1.description}" />    
+                </tr>
+                <tr>
+                    <td>Player 2</td>
+                    <td><a th:href="${'/gui/engines/'+ player2.engine.id}" th:text="${player2.engine.id}"/></td>
+                    <td><a th:href="${'/gui/engines/'+ player2.engine.id}" th:text="${player2.engine.name}"/></td>
+                    <td th:text="${player2.id}"/>
+                    <td th:text="${player2.description}" />    
+                </tr>
+            </table>
             
             Games:
             <table>
                 <tr>
                     <th>ID</th>
                     <th>Result</th>
+                    <td>Player 1</td>
+                    <td>Player 2</td>
                 </tr>
                 <tr th:each="game:${games}">
-                    <td><a th:href="${'/gui/games/' + game.id}"th:text="${game.id}"/></td>
-                    <td><a th:href="${'/gui/games/' + game.id}" th:text="${game.result}"/></td>
+                    <td><a th:href="${'/gui/games/' + game.game.id}"th:text="${game.game.id}"/></td>
+                    <td><a th:href="${'/gui/games/' + game.game.id}" th:text="${game.game.result}"/></td>
+                    <td th:text="${game.score1}" />
+                    <td th:text="${game.score2}" />
                 </tr>
             </table>    
 

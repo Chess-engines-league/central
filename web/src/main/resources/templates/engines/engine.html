@@ -32,17 +32,32 @@
                     <td th:text="${connectionCommand}" />
                 </tr>
             </table>
-            SubEngines:
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Description</th>
-                </tr>
-                <tr th:each="subengine:${engine.subengines}">
-                    <td><a th:href="${'/gui/engine/' + subengine.id}"th:text="${subengine.id}"/></td>
-                    <td><a th:href="${'/gui/engine/' + subengine.id}" th:text="${subengine.description}"/></td>
-                </tr>
-            </table>    
+            <div th:if="${engine.type.name() == 'HYBRID'}">
+                SubEngines:
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr th:each="subengine:${engine.subengines}">
+                        <td><a th:href="${'/gui/engines/' + subengine.id}"th:text="${subengine.id}"/></td>
+                        <td><a th:href="${'/gui/engines/' + subengine.id}" th:text="${subengine.description}"/></td>
+                    </tr>
+                </table>    
+            </div>
+            <div th:unless="${engine.type.name() == 'HYBRID'}">
+                Configurations:
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr th:each="config: ${engine.configs}">
+                        <td th:text="${config.id}"></td>
+                        <td th:text="${config.description}"></td>
+                    </tr>
+                </table>    
+            </div>
         </div>
     </body>
 </html>

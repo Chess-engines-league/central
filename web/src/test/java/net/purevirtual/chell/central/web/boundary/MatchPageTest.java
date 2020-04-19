@@ -35,7 +35,11 @@ public class MatchPageTest {
         game.setWhitePlayedByFirstAgent(true);
         Match match = new Match();
         EngineConfig engineConfig = new EngineConfig();
-        engineConfig.setEngine(new Engine());
+        Engine engine = new Engine();
+        engine.setName("name1");
+        engineConfig.setEngine(engine);
+        engineConfig.setId(123);
+        engineConfig.setDescription("desc 2");
         match.setPlayer1(engineConfig);
         match.setPlayer2(engineConfig);
         game.setMatch(match);

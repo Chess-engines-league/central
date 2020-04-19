@@ -3,6 +3,7 @@ package net.purevirtual.chell.central.web.boundary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,8 +14,8 @@ import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.context.WebContext;
 
 @Path("/matches")
 @Produces(MediaType.TEXT_HTML)
@@ -31,9 +32,38 @@ public class MatchPage extends PageResource {
     @Path("/{matchId}")
     public String get(@PathParam("matchId") int matchId) {
         Match match = matchManager.get(matchId);
-        List<Game> games = gameManager.findByMatch(match);
+        List<GameWithScore> games = gameManager.findByMatch(match).stream()
+                .map(game -> {
+                    String score1 = "";
+                    String score2 = "";
+                    if (game.getResult() == GameResult.WHITE) {
+                        if (game.isWhitePlayedByFirstAgent()) {
+                            score1 = "1";
+                            score2 = "0";
+                        } else {
+                            score1 = "0";
+                            score2 = "1";
+                        }
+                    }
+                    if (game.getResult() == GameResult.BLACK) {
+                        if (game.isWhitePlayedByFirstAgent()) {
+                            score1 = "0";
+                            score2 = "1";
+                        } else {
+                            score1 = "1";
+                            score2 = "0";
+                        }
+                    }
+                    if (game.getResult() == GameResult.DRAW) {
+                        score1 = "0.5";
+                        score2 = "0.5";
+                    }
+                    return new GameWithScore(game, score1, score2);
+                }).collect(Collectors.toList());
         Map<String, Object> context = new HashMap();
         context.put("match", match);
+        context.put("player1", match.getPlayer1());
+        context.put("player2", match.getPlayer2());
         context.put("games", games);
         return getTemplateEngine().process("matches/match", new Context(null, context));
     }
@@ -46,6 +76,18 @@ public class MatchPage extends PageResource {
 
         context.put("matches", matches);
         return getTemplateEngine().process("matches/list", new Context(null, context));
+    }
+    
+    private static class GameWithScore {
+        public Game game;
+        public String score1;
+        public String score2;
+
+        public GameWithScore(Game game, String score1, String score2) {
+            this.game = game;
+            this.score1 = score1;
+            this.score2 = score2;
+        }
     }
     
 }
