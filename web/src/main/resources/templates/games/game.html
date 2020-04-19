@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" >
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <th:block th:replace="layout :: header"></th:block>
+        <th:block th:replace="layout :: head"></th:block>
         <title>Game [[${game.id}]] - Chess Engine League</title>
         <script src="/static/chessboardjs/js/chessboard-1.0.0.js"></script>
         <link rel="stylesheet"  href="/static/chessboardjs/css/chessboard-1.0.0.css" />
     </head>
     <body>
-        <div class="container">
+        <div th:replace="layout :: navbar"></div>
+        <div class="contain">
             <table>
                 <tr>
                     <th>Game ID</th>
@@ -30,43 +31,42 @@
                     <th>konfiguracja</th>
                 </tr>
                 <tr>
-                    <td>Białe</td>
+                    <td>White</td>
                     <td th:text="${white.id}"/>
                     <td th:text="${white.agent.name}"/>
                     <td th:text="${white.description}" />    
                 </tr>
                 <tr>
-                    <td>Czarne</td>
+                    <td>Black</td>
                     <td th:text="${black.id}"/>
                     <td th:text="${black.agent.name}"/>
                     <td th:text="${black.description}" />    
                 </tr>
             </table>
             <div class="row">
-                <div id="myBoard" class="col-sm-6">
-                    <!--                    <div " style="width: 400px"></div>-->
+                <div class="col-sm-8">
+                    <div id="myBoard"></div>
+                    <div class="row">
+                        <div class="col-sm-1">
+                            <a href="#" onclick="first();return false">&lt;&lt;</a>
+                        </div>
+                        <div class="col-sm-1">
+                            <a href="#" onclick="previous();return false">&lt;</a>
+                        </div>
+                        <div class="col-sm-2">
+                            move selector
+                        </div>
+                        <div class="col-sm-1">
+                            <a href="#" onclick="next();return false">&gt;</a>
+                        </div>
+                        <div class="col-sm-1">
+                            <a href="#" onclick="last();return false">&gt;&gt;</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-6">
-                    <p >Ruchy</p>
+                <div class="col-sm-4">
+                    <p >Moves</p>
                     <p th:text="${game.boardState}" />
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-1">
-                    <a href="#" onclick="first();return false">&lt;&lt;</a>
-                </div>
-                <div class="col-sm-1">
-                    <a href="#" onclick="previous();return false">&lt;</a>
-                </div>
-                <div class="col-sm-2">
-                    move selector
-                </div>
-                <div class="col-sm-1">
-                    <a href="#" onclick="next();return false">&gt;</a>
-                </div>
-                <div class="col-sm-1">
-                    <a href="#" onclick="last();return false">&gt;&gt;</a>
                 </div>
             </div>
         </div>

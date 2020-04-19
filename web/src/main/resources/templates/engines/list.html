@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="layout :: head"></th:block>
+        <title>Engines - Chess Engine League</title>
+    </head>
+    <body>
+        <div th:replace="layout :: navbar"></div>
+        <div class="container">
+
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                </tr>
+                <tr th:each="engine: ${engines}">
+                    <td><a th:href="${'/gui/engines/'+ engine.id}" th:text="${engine.id}"/></td>
+                    <td><a th:href="${'/gui/engines/'+ engine.id}" th:text="${engine.name}"/></td>
+                    <td th:text="${engine.type}"></td>
+                </tr>
+            </table>    
+
+
+        </div>
+    </body>
+</html>

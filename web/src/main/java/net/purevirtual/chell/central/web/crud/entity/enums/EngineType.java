@@ -4,6 +4,7 @@ public enum EngineType {
     ETHEREAL12("Ethereal 12"),
     FRUIT("Fruit"),
     GLAURUNG("Glaurung"),
+    HYBRID("HYBRID"),
     LC0("Leela Chess Zero"),
     OTHER("Other"),
     STOCKFISH8("Stockfish 8"),

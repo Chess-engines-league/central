@@ -1,6 +1,8 @@
 package net.purevirtual.chell.central.web.boundary;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -11,6 +13,7 @@ import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.context.WebContext;
 
 @Path("/matches")
@@ -29,19 +32,20 @@ public class MatchPage extends PageResource {
     public String get(@PathParam("matchId") int matchId) {
         Match match = matchManager.get(matchId);
         List<Game> games = gameManager.findByMatch(match);
-        WebContext context = newContext();
-        context.setVariable("match", match);
-        context.setVariable("games", games);
-        return getTemplateEngine().process("matches/match", context);
+        Map<String, Object> context = new HashMap();
+        context.put("match", match);
+        context.put("games", games);
+        return getTemplateEngine().process("matches/match", new Context(null, context));
     }
 
     
     @GET
     public String list() {
         List<Match> matches = matchManager.findAll();
-        WebContext context = newContext();
-        context.setVariable("matches", matches);
-        return getTemplateEngine().process("matches/list", context);
+        Map<String, Object> context = new HashMap();
+
+        context.put("matches", matches);
+        return getTemplateEngine().process("matches/list", new Context(null, context));
     }
     
 }

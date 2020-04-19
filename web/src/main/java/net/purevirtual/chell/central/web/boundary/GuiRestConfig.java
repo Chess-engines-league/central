@@ -14,6 +14,7 @@ public class GuiRestConfig extends Application {
         classes.add(IndexPage.class);
         classes.add(MatchPage.class);
         classes.add(GamePage.class);
+        classes.add(EnginePage.class);
         return classes;
     }
 

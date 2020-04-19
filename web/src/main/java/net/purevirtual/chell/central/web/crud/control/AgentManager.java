@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.control;
 
+import java.util.List;
 import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -24,6 +25,11 @@ public class AgentManager {
         return entityManager.createQuery("select a from Agent a where a.token=:token", Agent.class)
                 .setParameter("token", token)
                 .getResultList().stream().findFirst();
+    }
+    
+    public List<Agent> findAll() {
+        return entityManager.createQuery("select a from Agent a", Agent.class)
+                .getResultList();
     }
 
 }

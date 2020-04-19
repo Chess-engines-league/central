@@ -1,5 +1,7 @@
 package net.purevirtual.chell.central.web.boundary;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +10,6 @@ import javax.ws.rs.core.Context;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 
 public abstract class PageResource {
 
@@ -18,33 +19,22 @@ public abstract class PageResource {
     private HttpServletRequest servletRequest;
     @Context
     private HttpServletResponse servletResponse;
+    private TemplateEngine templateEngine;
 
-
-    protected WebContext newContext() {
-        return new WebContext(servletRequest, servletResponse, servletContext);
-    }
-
-    protected TemplateEngine getTemplateEngine() {
-//        ServletContextTemplateResolver templateResolver
-//                = new ServletContextTemplateResolver(servletContext);
-//
-//        // This will convert "home" to "/WEB-INF/templates/home.html"
-//        templateResolver.setPrefix("/WEB-INF/templates/");
-//        templateResolver.setSuffix(".html");
-//        // Template cache TTL=1h. If not set, entries would be cached until expelled
-//        templateResolver.setCacheTTLMs(3600000L);
-//
-//        // Cache is set to true by default. Set to false if you want templates to
-//        // be automatically updated when modified.
-//        templateResolver.setCacheable(true);
-
-        TemplateEngine templateEngine = new TemplateEngine();
+    public PageResource() {
+        templateEngine = new TemplateEngine();
         ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
         classLoaderTemplateResolver.setPrefix("/templates/");
         classLoaderTemplateResolver.setSuffix(".html");
         templateEngine.setTemplateResolver(classLoaderTemplateResolver);
-        //templateEngine.setTemplateResolver(templateResolver);
+    }
+
+    protected TemplateEngine getTemplateEngine() {
         return templateEngine;
+    }
+
+    protected String process(String template, Map<String, Object> context) {
+        return templateEngine.process(template, new org.thymeleaf.context.Context(null, context));
     }
 
 }

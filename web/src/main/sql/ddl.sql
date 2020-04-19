@@ -9,7 +9,7 @@ grant usage on "user_id_seq" to jboss_chell_central;
 
 CREATE TABLE public.agent (
 	id serial NOT NULL,
-	"token" text NOT NULL,
+	"token" text NULL,
 	"name" text NOT NULL,
 	description text NULL,
 	initoptions text NULL,

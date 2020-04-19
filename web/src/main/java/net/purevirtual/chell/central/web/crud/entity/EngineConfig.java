@@ -1,12 +1,16 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.SequenceGenerator;
 
 @Entity
@@ -24,6 +28,11 @@ public class EngineConfig {
     private String description;
     private String initOptions;
     private int elo;
+    
+    @OrderColumn(name = "order")
+    @ManyToMany
+    @JoinTable(name = "subengines")
+    private List<EngineConfig> subEngines;
 
     public Integer getId() {
         return id;
@@ -63,6 +72,14 @@ public class EngineConfig {
 
     public void setElo(int elo) {
         this.elo = elo;
+    }
+
+    public List<EngineConfig> getSubEngines() {
+        return subEngines;
+    }
+
+    public void setSubEngines(List<EngineConfig> subEngines) {
+        this.subEngines = subEngines;
     }
 
 }
