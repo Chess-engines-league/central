@@ -5,10 +5,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Context;
-import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import org.thymeleaf.templateresolver.ITemplateResolver;
 
 public abstract class PageResource {
 
@@ -25,22 +25,25 @@ public abstract class PageResource {
     }
 
     protected TemplateEngine getTemplateEngine() {
-        ServletContextTemplateResolver templateResolver
-                = new ServletContextTemplateResolver(servletContext);
-
-        // This will convert "home" to "/WEB-INF/templates/home.html"
-        templateResolver.setPrefix("/WEB-INF/templates/");
-        templateResolver.setSuffix(".html");
-        // Template cache TTL=1h. If not set, entries would be cached until expelled
-        templateResolver.setCacheTTLMs(3600000L);
-
-        // Cache is set to true by default. Set to false if you want templates to
-        // be automatically updated when modified.
-        templateResolver.setCacheable(true);
+//        ServletContextTemplateResolver templateResolver
+//                = new ServletContextTemplateResolver(servletContext);
+//
+//        // This will convert "home" to "/WEB-INF/templates/home.html"
+//        templateResolver.setPrefix("/WEB-INF/templates/");
+//        templateResolver.setSuffix(".html");
+//        // Template cache TTL=1h. If not set, entries would be cached until expelled
+//        templateResolver.setCacheTTLMs(3600000L);
+//
+//        // Cache is set to true by default. Set to false if you want templates to
+//        // be automatically updated when modified.
+//        templateResolver.setCacheable(true);
 
         TemplateEngine templateEngine = new TemplateEngine();
-        templateEngine.setTemplateResolver(templateResolver);
-        templateEngine.addDialect(new LayoutDialect());
+        ClassLoaderTemplateResolver classLoaderTemplateResolver = new ClassLoaderTemplateResolver();
+        classLoaderTemplateResolver.setPrefix("/templates/");
+        classLoaderTemplateResolver.setSuffix(".html");
+        templateEngine.setTemplateResolver(classLoaderTemplateResolver);
+        //templateEngine.setTemplateResolver(templateResolver);
         return templateEngine;
     }
 

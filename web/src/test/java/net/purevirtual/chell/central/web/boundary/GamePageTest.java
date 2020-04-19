@@ -5,9 +5,9 @@ import net.purevirtual.chell.central.web.crud.entity.Agent;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
-import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.Test;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -44,9 +44,8 @@ public class GamePageTest {
         System.out.println("get");
         int gameId = 0;
         
-        String expResult = "";
         String result = sut.get(gameId);
-        assertEquals(expResult, result);
+        assertTrue(!result.isBlank());
     }
 
     /**
@@ -55,9 +54,8 @@ public class GamePageTest {
     @Test
     public void testList() {
         System.out.println("list");
-        String expResult = "";
         String result = sut.list();
-        assertEquals(expResult, result);
+        assertTrue(!result.isBlank());
     }
     
 }

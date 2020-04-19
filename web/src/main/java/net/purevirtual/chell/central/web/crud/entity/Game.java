@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,7 +18,7 @@ import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 
 @Entity
 public class Game {
-        @Id
+    @Id
     @SequenceGenerator(name="game_id_seq", sequenceName="game_id_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="user_id_seq")
     @Column(name = "id", updatable=false)
@@ -36,6 +37,9 @@ public class Game {
     private GameResult result;
     
     public List<String> getMoves() {
+        if (boardState == null || boardState.isBlank()) {
+            return new ArrayList<>();
+        }
         return Stream.of(boardState.split("\\s+")).filter(s -> !s.isBlank()).collect(Collectors.toList());
     }
 
