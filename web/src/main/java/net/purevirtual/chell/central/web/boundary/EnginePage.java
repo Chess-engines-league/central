@@ -10,7 +10,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import net.purevirtual.chell.central.web.crud.control.AgentManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 
 @Path("/engines")
@@ -26,7 +26,7 @@ public class EnginePage extends PageResource {
     @GET
     @Path("/{engineId}")
     public String get(@PathParam("engineId") int engineId) {
-        Agent engine = agentManager.get(engineId);
+        Engine engine = agentManager.get(engineId);
         String connectionCommand = null;
         if(engine.getType()!= EngineType.HYBRID) {
             String cmd;
@@ -45,14 +45,14 @@ public class EnginePage extends PageResource {
         }
         Map<String, Object> context = new HashMap();
         context.put("engine", engine);
-        context.put("connectionCommand", engine);
+        context.put("connectionCommand", connectionCommand);
         return process("engines/engine", context);
     }
 
     
     @GET
     public String list() {
-        List<Agent> agents = agentManager.findAll();
+        List<Engine> agents = agentManager.findAll();
         Map<String, Object> context = new HashMap();
         context.put("engines", agents);
         return process("engines/list", context);

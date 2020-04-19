@@ -22,24 +22,24 @@
 
             <table>
                 <tr>
-                    <th rowspan="2">Strona</th>
-                    <th colspan="2">gracz/silnik</th>    
+                    <th rowspan="2">Side</th>
+                    <th colspan="2">player/engine</th>    
                 </tr>
                 <tr>
                     <th>id</th>
-                    <th>opis</th>
-                    <th>konfiguracja</th>
+                    <th>description</th>
+                    <th>configuration</th>
                 </tr>
                 <tr>
                     <td>White</td>
                     <td th:text="${white.id}"/>
-                    <td th:text="${white.agent.name}"/>
+                    <td th:text="${white.engine.name}"/>
                     <td th:text="${white.description}" />    
                 </tr>
                 <tr>
                     <td>Black</td>
                     <td th:text="${black.id}"/>
-                    <td th:text="${black.agent.name}"/>
+                    <td th:text="${black.engine.name}"/>
                     <td th:text="${black.description}" />    
                 </tr>
             </table>

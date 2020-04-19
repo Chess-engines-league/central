@@ -4,7 +4,7 @@ import java.util.Collections;
 import javax.inject.Inject;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
@@ -35,7 +35,7 @@ public class MatchPageTest {
         game.setWhitePlayedByFirstAgent(true);
         Match match = new Match();
         EngineConfig engineConfig = new EngineConfig();
-        engineConfig.setAgent(new Agent());
+        engineConfig.setEngine(new Engine());
         match.setPlayer1(engineConfig);
         match.setPlayer2(engineConfig);
         game.setMatch(match);

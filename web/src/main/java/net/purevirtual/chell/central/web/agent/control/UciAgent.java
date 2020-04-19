@@ -7,23 +7,23 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UciAgent {
+public class UciAgent implements IAgent {
     private static final Logger logger = LoggerFactory.getLogger(UciAgent.class);
     private final AgentInput remote;
     private State state;
-    private Agent agentEntity;
+    private Engine agentEntity;
     private final ReentrantLock mutex = new ReentrantLock();
     private LiveGame liveGame;
     // FIXME: maybe optional or normal variables instead of lists?
     private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
     private List<CompletableFuture<String>> moveFutures = new ArrayList<>();
     private LocalDateTime lastMessage = null;
-    public UciAgent(AgentInput remote, Agent agentEntity) {
+    public UciAgent(AgentInput remote, Engine agentEntity) {
         this.remote = remote;
         this.agentEntity = agentEntity;
         state = State.WAIT_FOR_UCI_OK;
@@ -36,7 +36,7 @@ public class UciAgent {
         }
     }
     
-    public Future<String>  move(List<String> movesSoFar, long moveTimeLimit) {
+    public CompletableFuture<String>  move(List<String> movesSoFar, long moveTimeLimit) {
         state=State.WAIT_FOR_MOVE;
         if (movesSoFar.isEmpty()) {
             remote.send("position startpos");
@@ -87,7 +87,7 @@ public class UciAgent {
         }
     } 
 
-    public Future<Void> reset(EngineConfig engineConfig) {
+    public CompletableFuture<Void> reset(EngineConfig engineConfig) {
         state = State.WAIT_FOR_READY_OK;
         sendOptions(engineConfig);
         remote.send("ucinewgame", "isready");
@@ -110,7 +110,7 @@ public class UciAgent {
         }
     }
 
-    public Agent getAgentEntity() {
+    public Engine getAgentEntity() {
         return agentEntity;
     }
 
@@ -129,6 +129,11 @@ public class UciAgent {
             logger.info("agent {}: leaving game {}", this.agentEntity.getId(), liveGame.getGame().getId());
             this.liveGame = null;
         }
+    }
+
+    @Override
+    public int getId() {
+        return agentEntity.getId();
     }
 
     enum State {

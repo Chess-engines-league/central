@@ -7,7 +7,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
@@ -28,20 +28,21 @@ public class GameStarter {
     
     public void tryStart(Match match, Game game) {
         EngineConfig player1 = match.getPlayer1();
-        
-        Optional<UciAgent> agentOpt1 = liveAgentsManager.find(player1.getAgent());
+        EngineConfig player2 = match.getPlayer2();
+        logger.info("Trying to start game {} between {} and {}", game.getId(), player1, player2);
+        Optional<IAgent> agentOpt1 = liveAgentsManager.find(player1.getEngine());
         if (agentOpt1.isEmpty()) {
-            logger.info("Cannot start game {} from match {}, the agent {} is not online", game.getId(), match.getId(), player1.getAgent().getId());
+            logger.info("Cannot start game {} from match {}, the agent {} is not online", game.getId(), match.getId(), player1.getEngine().getId());
             return;
         }
-        EngineConfig player2 = match.getPlayer1();
-        Optional<UciAgent> agentOpt2 = liveAgentsManager.find(player2.getAgent());
+        
+        Optional<IAgent> agentOpt2 = liveAgentsManager.find(player2.getEngine());
         if (agentOpt2.isEmpty()) {
-            logger.info("Cannot start game {} from match {}, the agent {} is not online", game.getId(), match.getId(), player2.getAgent().getId());
+            logger.info("Cannot start game {} from match {}, the agent {} is not online", game.getId(), match.getId(), player2.getEngine().getId());
             return;
         }
-        UciAgent agent1 = agentOpt1.get();
-        UciAgent agent2 = agentOpt2.get();
+        IAgent agent1 = agentOpt1.get();
+        IAgent agent2 = agentOpt2.get();
         LiveGame liveGame;
         if (game.isWhitePlayedByFirstAgent()) {
             liveGame = new LiveGame(game, agent1, agent2, player1, player2);

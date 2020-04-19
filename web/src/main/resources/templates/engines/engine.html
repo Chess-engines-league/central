@@ -32,6 +32,17 @@
                     <td th:text="${connectionCommand}" />
                 </tr>
             </table>
+            SubEngines:
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                </tr>
+                <tr th:each="subengine:${engine.subengines}">
+                    <td><a th:href="${'/gui/engine/' + subengine.id}"th:text="${subengine.id}"/></td>
+                    <td><a th:href="${'/gui/engine/' + subengine.id}" th:text="${subengine.description}"/></td>
+                </tr>
+            </table>    
         </div>
     </body>
 </html>

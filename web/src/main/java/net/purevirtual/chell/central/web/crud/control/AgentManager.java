@@ -5,7 +5,7 @@ import java.util.Optional;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,18 +17,18 @@ public class AgentManager {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Agent get(Integer id) {
-        return entityManager.find(Agent.class, id);
+    public Engine get(Integer id) {
+        return entityManager.find(Engine.class, id);
     }
 
-    public Optional<Agent> findByToken(String token) {
-        return entityManager.createQuery("select a from Agent a where a.token=:token", Agent.class)
+    public Optional<Engine> findByToken(String token) {
+        return entityManager.createQuery("select e from Engine e where e.token=:token", Engine.class)
                 .setParameter("token", token)
                 .getResultList().stream().findFirst();
     }
     
-    public List<Agent> findAll() {
-        return entityManager.createQuery("select a from Agent a", Agent.class)
+    public List<Engine> findAll() {
+        return entityManager.createQuery("select e from Engine e", Engine.class)
                 .getResultList();
     }
 

@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.ejb.AsyncResult;
@@ -47,8 +48,10 @@ public class GameRunnerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(white.reset(any())).thenReturn(new AsyncResult<>(null));
-        when(black.reset(any())).thenReturn(new AsyncResult<>(null));
+        CompletableFuture<Void> t = new CompletableFuture<>();
+        t.complete(null);
+        when(white.reset(any())).thenReturn(t);
+        when(black.reset(any())).thenReturn(t);
         
     }
     
@@ -59,11 +62,11 @@ public class GameRunnerTest {
     @Test
     public void testRun() throws Exception {
         logger.info("white = {}",white);
-        Future<String> move1 = mockMove("f2f3");
-        Future<String> move2 = mockMove("e7e5");
-        Future<String> move3 = mockMove("g2g4");
-        Future<String> move4 = mockMove("d8h4");
-        Future<Void> mockReset = mockReset();
+        CompletableFuture<String> move1 = mockMove("f2f3");
+        CompletableFuture<String> move2 = mockMove("e7e5");
+        CompletableFuture<String> move3 = mockMove("g2g4");
+        CompletableFuture<String> move4 = mockMove("d8h4");
+        CompletableFuture<Void> mockReset = mockReset();
         
         when(white.move(any(), anyLong())).thenReturn(move1, move3);
         when(black.move(any(), anyLong())).thenReturn(move2, move4);
@@ -76,18 +79,24 @@ public class GameRunnerTest {
         assertTrue(result.equals(GameResult.BLACK));
     }
     
-    private static Future<String> mockMove(String input) throws Exception {
-        Future<String>  result = Mockito.mock(Future.class);
-        when(result.get()).thenReturn(input);
-        when(result.get(anyLong(), any(TimeUnit.class))).thenReturn(input);
-        return result;
+    private static CompletableFuture<String> mockMove(String input) throws Exception {
+        CompletableFuture<String> t = new CompletableFuture<>();
+        t.complete(input);
+        return t;
+//        Future<String>  result = Mockito.mock(Future.class);
+//        when(result.get()).thenReturn(input);
+//        when(result.get(anyLong(), any(TimeUnit.class))).thenReturn(input);
+//        return result;
     }
     
-    private static Future<Void> mockReset() throws Exception {
-        Future<Void>  result = Mockito.mock(Future.class);
-        when(result.get()).thenReturn(null);
-        when(result.get(anyLong(), any(TimeUnit.class))).thenReturn(null);
-        return result;
+    private static CompletableFuture<Void> mockReset() throws Exception {
+        CompletableFuture<Void> t = new CompletableFuture<>();
+        t.complete(null);
+        return t;
+//        Future<Void>  result = Mockito.mock(Future.class);
+//        when(result.get()).thenReturn(null);
+//        when(result.get(anyLong(), any(TimeUnit.class))).thenReturn(null);
+//        return result;
     }
     
 }

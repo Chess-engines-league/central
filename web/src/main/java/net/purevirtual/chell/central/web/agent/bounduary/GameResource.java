@@ -11,7 +11,7 @@ import net.purevirtual.chell.central.web.agent.control.LiveAgentsManager;
 import net.purevirtual.chell.central.web.agent.control.MatchMaker;
 import net.purevirtual.chell.central.web.crud.control.AgentManager;
 import net.purevirtual.chell.central.web.crud.control.EngineConfigManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 
 @Path("/games")

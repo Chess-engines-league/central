@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.purevirtual.chell.central.web.agent.control.IAgent;
 import net.purevirtual.chell.central.web.agent.control.UciAgent;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
@@ -11,14 +12,14 @@ import net.purevirtual.chell.central.web.crud.entity.Game;
 public class LiveGame {
 
     private List<String> moves = new ArrayList<>();
-    private UciAgent white;
+    private IAgent white;
     private final EngineConfig whiteConfig;
-    private UciAgent black;
+    private IAgent black;
     private final EngineConfig blackConfig;
 
     private Game game;
 
-    public LiveGame(Game game, UciAgent white, UciAgent black, EngineConfig whiteConfig, EngineConfig blackConfig, String moves) {
+    public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig, String moves) {
         this.white = white;
         this.black = black;
         if (moves != null) {
@@ -31,7 +32,7 @@ public class LiveGame {
         this.whiteConfig = whiteConfig;
     }
 
-    public LiveGame(Game game, UciAgent white, UciAgent black, EngineConfig whiteConfig, EngineConfig blackConfig) {
+    public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig) {
         this(game, white, black, whiteConfig, blackConfig, game.getBoardState());
     }
 
@@ -43,11 +44,11 @@ public class LiveGame {
         return String.join(" ", moves);
     }
 
-    public UciAgent getWhite() {
+    public IAgent getWhite() {
         return white;
     }
 
-    public UciAgent getBlack() {
+    public IAgent getBlack() {
         return black;
     }
 

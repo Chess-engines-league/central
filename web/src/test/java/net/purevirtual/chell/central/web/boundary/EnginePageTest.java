@@ -4,7 +4,7 @@ import java.util.Collections;
 import net.purevirtual.chell.central.web.crud.control.AgentManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class EnginePageTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        Agent agent = new Agent();
+        Engine agent = new Engine();
         agent.setType(EngineType.OTHER);
         when(agentManager.findAll()).thenReturn(Collections.singletonList(agent));
         when(agentManager.get(any())).thenReturn(agent);

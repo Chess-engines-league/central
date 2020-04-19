@@ -36,19 +36,20 @@ public class GameRunner {
     }
     
     public GameResult runSync(LiveGame game) {
-        UciAgent white = game.getWhite();
-        UciAgent black = game.getBlack();
+        IAgent white = game.getWhite();
+        IAgent black = game.getBlack();
+        logger.info("running {} between {} and {}", game, white.getId(), black.getId());
         try {
             
             if (!white.assignGame(game)) {
-                logger.info("Cannot start game {} from match {}, the agent {} is busy"
-                        , game.getGame().getId(), game.getGame().getMatch().getId(), game.getWhite().getAgentEntity().getId()
+                logger.info("Cannot start game {} from match {}, the agent {} is busy",
+                        game.getGame().getId(), game.getGame().getMatch().getId(), game.getWhite().getId()
                 );
                 return GameResult.PENDING;
             }
             if (!black.assignGame(game)) {
-                logger.info("Cannot start game {} from match {}, the agent {} is busy"
-                        , game.getGame().getId(), game.getGame().getMatch().getId(), game.getBlack().getAgentEntity().getId()
+                logger.info("Cannot start game {} from match {}, the agent {} is busy",
+                        game.getGame().getId(), game.getGame().getMatch().getId(), game.getBlack().getId()
                 );
                 return GameResult.PENDING;
             }
@@ -106,7 +107,7 @@ public class GameRunner {
         return GameResult.ERROR;
     }
     
-    private Optional<GameResult> halfMove(LiveGame game, UciAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
+    private Optional<GameResult> halfMove(LiveGame game, IAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
         logger.info("{} start a move", side);
         Future<String> moveFuture = agent.move(game.getMoves(), moveLimit);
         String move;

@@ -54,3 +54,15 @@ CREATE TABLE public.engineconfig (
 );
 grant select,insert on "engineconfig" to jboss_chell_central;
 grant usage on "engineconfig_id_seq" to jboss_chell_central;
+
+
+
+CREATE TABLE public.subengines (
+	id serial NOT NULL,
+	engine_id int4 NOT NULL,
+	subengines_id int4 NULL,
+	CONSTRAINT subengines_pk PRIMARY KEY (id)
+);
+
+grant select,insert on "subengines" to jboss_chell_central;
+grant usage on "subengines_id_seq" to jboss_chell_central;

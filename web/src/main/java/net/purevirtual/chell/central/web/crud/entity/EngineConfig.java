@@ -10,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
 import javax.persistence.SequenceGenerator;
 
 @Entity
@@ -23,16 +22,11 @@ public class EngineConfig {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="idagent")
-    private Agent agent;
+    @JoinColumn(name="idengine")
+    private Engine engine;
     private String description;
     private String initOptions;
     private int elo;
-    
-    @OrderColumn(name = "order")
-    @ManyToMany
-    @JoinTable(name = "subengines")
-    private List<EngineConfig> subEngines;
 
     public Integer getId() {
         return id;
@@ -42,12 +36,12 @@ public class EngineConfig {
         this.id = id;
     }
 
-    public Agent getAgent() {
-        return agent;
+    public Engine getEngine() {
+        return engine;
     }
 
-    public void setAgent(Agent agent) {
-        this.agent = agent;
+    public void setEngine(Engine engine) {
+        this.engine = engine;
     }
 
     public String getDescription() {
@@ -74,12 +68,13 @@ public class EngineConfig {
         this.elo = elo;
     }
 
-    public List<EngineConfig> getSubEngines() {
-        return subEngines;
-    }
-
-    public void setSubEngines(List<EngineConfig> subEngines) {
-        this.subEngines = subEngines;
+    @Override
+    public String toString() {
+        return "EngineConfig{"
+                + "id=" + id
+                + ", engine=" + engine
+                + ", description=" + description
+                + '}';
     }
 
 }

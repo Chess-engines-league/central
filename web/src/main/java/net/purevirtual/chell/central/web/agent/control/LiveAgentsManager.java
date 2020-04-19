@@ -9,11 +9,16 @@ import java.util.TreeMap;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
-import net.purevirtual.chell.central.web.crud.entity.Agent;
+import net.purevirtual.chell.central.web.crud.entity.Engine;
+import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Startup
 @Singleton
 public class LiveAgentsManager {
+    private static final Logger logger = LoggerFactory.getLogger(LiveAgentsManager.class);
 
     Map<String, UciAgent> agents = new TreeMap<>();
     // TODO: czy obslugiwac wiele sesji tego samego agenta?
@@ -40,8 +45,21 @@ public class LiveAgentsManager {
         }
     }
     
-    public Optional<UciAgent> find(Agent agent) {
-        return Optional.ofNullable(agentsById.get(agent.getId()));
+    public Optional<IAgent> find(Engine engine) {
+        if (engine.getType() == EngineType.HYBRID) {
+            logger.info("Hybrid agent has {} subagents", engine.getSubEngines());
+            List<HybridAgent.HybridSubAgent> subAgents = new ArrayList<>();
+            for (EngineConfig subEngine : engine.getSubEngines()) {
+                logger.info("Checking for {} if subengine is online {}", engine, subEngine);
+                UciAgent subAgent = agentsById.get(subEngine.getId());
+                if (subAgent == null) {
+                    return Optional.empty();
+                }
+                subAgents.add(new HybridAgent.HybridSubAgent(subAgent, subEngine));
+            }
+            return Optional.of(new HybridAgent(engine, subAgents));
+        }
+        return Optional.ofNullable(agentsById.get(engine.getId()));
     }
 
     public UciAgent get(String sessionId) {
