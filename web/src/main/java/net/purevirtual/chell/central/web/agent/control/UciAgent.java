@@ -64,7 +64,7 @@ public class UciAgent implements IAgent {
                 BoardMove boardMove = new BoardMove();
                 boardMove.setMove(move);
                 if (parts.length == 4 && "ponder".equals(parts[2])) {
-                    boardMove.setPonder(move);
+                    boardMove.setPonder(parts[3]);
                 } else {
                     String comment = Stream.of(parts).skip(2).collect(Collectors.joining(" "));
                     boardMove.setComment(comment);
