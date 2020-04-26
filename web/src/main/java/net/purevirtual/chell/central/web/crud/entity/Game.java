@@ -1,7 +1,11 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.Column;
@@ -14,10 +18,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 
 @Entity
-public class Game {
+public class Game {   
     @Id
     @SequenceGenerator(name="game_id_seq", sequenceName="game_id_seq", allocationSize=1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="user_id_seq")
@@ -75,12 +80,16 @@ public class Game {
         this.gameNumber = gameNumber;
     }
 
-    public String getBoardState() {
-        return boardState;
+    public BoardState getBoardState() {
+        return BoardState.fromJson(boardState);
     }
 
-    public void setBoardState(String boardState) {
-        this.boardState = boardState;
+    public void setBoardState(BoardState boardState) {
+        if(boardState!= null) {
+            this.boardState = boardState.toJson();
+        } else {
+            this.boardState = "";
+        }
     }
 
     public GameResult getResult() {

@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,11 @@ public class GameManager {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     @Asynchronous
-    public void updateBoardState(Game game, List<String> moves) {
+    public void updateBoardState(Game game, BoardState moves) {
+        String json = moves.toJson();
         entityManager.createQuery("update Game g set g.boardState = :boardState where g.id = :id")
                 .setParameter("id", game.getId())
-                .setParameter("boardState", String.join(" ", moves))
+                .setParameter("boardState", json)
                 .executeUpdate();
     }
 

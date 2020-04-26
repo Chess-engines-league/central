@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.purevirtual.chell.central.web.agent.control.IAgent;
-import net.purevirtual.chell.central.web.agent.control.UciAgent;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 
 public class LiveGame {
 
-    private List<String> moves = new ArrayList<>();
+    private List<BoardMove> moves = new ArrayList<>();
     private IAgent white;
     private final EngineConfig whiteConfig;
     private IAgent black;
@@ -19,11 +19,11 @@ public class LiveGame {
 
     private Game game;
 
-    public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig, String moves) {
+    public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig, List<BoardMove> moves) {
         this.white = white;
         this.black = black;
         if (moves != null) {
-            this.moves = Stream.of(moves.split("\\s+")).filter(s -> !s.isBlank()).collect(Collectors.toList());
+            this.moves = moves;
         } else {
             this.moves = new ArrayList<>();
         }
@@ -33,15 +33,19 @@ public class LiveGame {
     }
 
     public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig) {
-        this(game, white, black, whiteConfig, blackConfig, game.getBoardState());
+        this(game, white, black, whiteConfig, blackConfig, game.getBoardState().getBoardMoves());
     }
 
-    public List<String> getMoves() {
+    public List<BoardMove> getMoves() {
         return moves;
     }
 
+    public List<String> getRawMoves() {
+        return moves.stream().map(BoardMove::getMove).collect(Collectors.toList());
+    }
+
     public String getMovesString() {
-        return String.join(" ", moves);
+        return String.join(" ", getRawMoves());
     }
 
     public IAgent getWhite() {

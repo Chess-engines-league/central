@@ -17,6 +17,8 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,20 +111,22 @@ public class GameRunner {
     
     private Optional<GameResult> halfMove(LiveGame game, IAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
         logger.info("{} start a move", side);
-        Future<String> moveFuture = agent.move(game.getMoves(), moveLimit);
-        String move;
+        Future<BoardMove> moveFuture = agent.move(game.getRawMoves(), moveLimit);
+        BoardMove move;
         try {
             move = moveFuture.get(2 * moveLimit, TimeUnit.MILLISECONDS);
         } catch (TimeoutException|ExecutionException ex) {
             logger.info("{} failed to return move in allowed time", side);
             return Optional.of(side.opponent().result());
         }
-        if (!isLegal(game.getMovesString(), move)) {
+        if (!isLegal(game.getMovesString(), move.getMove())) {
             logger.info("{} illegal move:  {}", side, move);
             return Optional.of(side.opponent().result());
         }
         game.getMoves().add(move);
-        gameManager.updateBoardState(game.getGame(), game.getMoves());
+        final BoardState boardState = new BoardState();
+        boardState.setBoardMoves(game.getMoves());
+        gameManager.updateBoardState(game.getGame(), boardState);
         logger.info("all moves after {} move: {}", side, game.getMoves());
         return isDone(game.getMovesString(), side);
     }

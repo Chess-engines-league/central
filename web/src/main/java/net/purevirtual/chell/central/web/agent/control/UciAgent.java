@@ -4,11 +4,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +23,7 @@ public class UciAgent implements IAgent {
     private LiveGame liveGame;
     // FIXME: maybe optional or normal variables instead of lists?
     private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
-    private List<CompletableFuture<String>> moveFutures = new ArrayList<>();
+    private List<CompletableFuture<BoardMove>> moveFutures = new ArrayList<>();
     private LocalDateTime lastMessage = null;
     public UciAgent(AgentInput remote, Engine agentEntity) {
         this.remote = remote;
@@ -36,15 +38,16 @@ public class UciAgent implements IAgent {
         }
     }
     
-    public CompletableFuture<String>  move(List<String> movesSoFar, long moveTimeLimit) {
-        state=State.WAIT_FOR_MOVE;
+    @Override
+    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit) {
+        state = State.WAIT_FOR_MOVE;
         if (movesSoFar.isEmpty()) {
             remote.send("position startpos");
         } else {
             remote.send("position startpos moves " + String.join(" ", movesSoFar));
         }
         remote.send("go movetime "+moveTimeLimit);
-        CompletableFuture<String> moveFuture = new CompletableFuture<>();
+        CompletableFuture<BoardMove> moveFuture = new CompletableFuture<>();
         moveFutures.add(moveFuture);
         return moveFuture;
     }
@@ -58,9 +61,13 @@ public class UciAgent implements IAgent {
         switch (cmd) {
             case "bestmove":
                 String move = parts[1];
+                String comment = Stream.of(parts).skip(1).collect(Collectors.joining(" "));
+                BoardMove boardMove = new BoardMove();
+                boardMove.setMove(move);
+                boardMove.setComment(comment);
                 // TODO: make this configurable
                 //remote.send("go ponder");
-                moveFutures.forEach(f -> f.complete(move));
+                moveFutures.forEach(f -> f.complete(boardMove));
                 moveFutures.clear();
                 break;
             case "info":

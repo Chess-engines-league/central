@@ -31,7 +31,7 @@ public class MatchMaker {
             game.setMatch(match);
             game.setGameNumber(gameNumber);
             game.setResult(GameResult.PENDING);
-            game.setBoardState("");
+            game.setBoardState(null);
             game.setWhitePlayedByFirstAgent(gameNumber % 2 == 1);
             gameManager.save(game);
         }

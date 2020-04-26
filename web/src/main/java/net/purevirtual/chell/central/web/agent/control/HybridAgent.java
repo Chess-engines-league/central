@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +68,9 @@ public class HybridAgent implements IAgent {
     }
 
     @Override
-    public CompletableFuture<String> move(List<String> movesSoFar, long moveTimeLimit) {
+    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit) {
         //TODO: dodać inne tryby wyboru
-        List<CompletableFuture<String>> futures = new ArrayList<>();
+        List<CompletableFuture<BoardMove>> futures = new ArrayList<>();
         for (HybridSubAgent subagent : subagents) {
             futures.add(subagent.agent.move(movesSoFar, moveTimeLimit));
         }
@@ -77,11 +78,11 @@ public class HybridAgent implements IAgent {
             CompletableFuture.allOf(toArray(futures));
             int choice = new Random().nextInt(futures.size());
             try {
-                List<String> moves = new ArrayList<>();
-                for (CompletableFuture<String> future : futures) {
+                List<BoardMove> moves = new ArrayList<>();
+                for (CompletableFuture<BoardMove> future : futures) {
                     moves.add(future.get());
                 }
-                String fin = futures.get(choice).get();
+                BoardMove fin = futures.get(choice).get();
                 logger.info("Selected move {} out of {}", fin, moves);
                 return fin;
             } catch (ExecutionException ex) {
