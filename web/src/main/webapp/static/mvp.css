@@ -55,7 +55,8 @@ body {
     overflow-x: hidden;
     /* padding: 1rem 0;*/
     /*bmfw*/
-    margin:40px auto;
+    /* margin:40px auto; */
+    margin:10px auto;
     max-width: 960px;
     /*line-height:1.6;*/
     /*font-size:18px;*/
@@ -136,7 +137,7 @@ nav {
     font-weight: bold;
     justify-content: space-between;
     /* change from margin-bottom: 7rem; */
-    margin-bottom: 4rem;
+    margin-bottom: 1rem;
 }
 
 nav ul {

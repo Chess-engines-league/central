@@ -10,6 +10,7 @@ import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,15 +77,14 @@ public class HybridAgent implements IAgent {
         }
         return CompletableFuture.supplyAsync(()-> {
             CompletableFuture.allOf(toArray(futures));
-            int choice = new Random().nextInt(futures.size());
             try {
                 List<BoardMove> moves = new ArrayList<>();
                 for (CompletableFuture<BoardMove> future : futures) {
                     moves.add(future.get());
                 }
-                BoardMove fin = futures.get(choice).get();
-                logger.info("Selected move {} out of {}", fin, moves);
-                return fin;
+                BoardMove selectMove = new HybridSelect().selectMove(HybridType.VOTE_ELO, moves, subagents);
+                logger.info("Selected move {} out of {}", selectMove, moves);
+                return selectMove;
             } catch (ExecutionException ex) {
                 throw new RuntimeException(ex);
             } catch (InterruptedException ex) {

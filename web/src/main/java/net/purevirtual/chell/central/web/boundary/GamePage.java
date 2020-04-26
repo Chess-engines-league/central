@@ -16,6 +16,7 @@ import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
+import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.context.WebContext;
@@ -47,7 +48,9 @@ public class GamePage extends PageResource {
         model.put("game", game);
         model.put("white", white);
         model.put("black", black);
-        model.put("fenList", new Gson().toJson(getFenList(game)));
+        List<SingleGameMove> fenList = getFenList(game);
+        model.put("fenList", fenList);
+        model.put("fenListJson", new Gson().toJson(fenList));
         return getTemplateEngine().process("games/game", new Context(null, model));
     }
 
@@ -59,23 +62,39 @@ public class GamePage extends PageResource {
         return getTemplateEngine().process("games/list", new Context(null, model));
     }
 
-    private List<String> getFenList(Game game) {
-        List<String> result = new ArrayList<>();
+    private List<SingleGameMove> getFenList(Game game) {
+        List<SingleGameMove> result = new ArrayList<>();
         List<String> cumulativeMoves = new ArrayList<>();
+        int i =0;
+        SingleGameMove startPosition = new SingleGameMove();
+        startPosition.fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        startPosition.index = i++;
+        result.add(startPosition);
         try {
-            for (String move : game.getMoves()) {
-
-                cumulativeMoves.add(move);
+            for (BoardMove boardMove : game.getBoardState().getBoardMoves()) {
+                cumulativeMoves.add(boardMove.getMove());
                 MoveList list = new MoveList();
                 list.loadFromText(String.join(" ", cumulativeMoves));
-                result.add(list.getFen());
-
+                SingleGameMove singleGameMove = new SingleGameMove();
+                singleGameMove.fen = list.getFen();
+                singleGameMove.move = boardMove.getMove();
+                singleGameMove.comment = boardMove.getComment();
+                singleGameMove.ponder = boardMove.getPonder();
+                singleGameMove.index = i++;
+                result.add(singleGameMove);
             }
-
         } catch (MoveConversionException ex) {
             logger.error("Failed to parse game move", ex);
         }
         return result;
+    }
+    
+    private static class SingleGameMove {
+        int index;
+        String move;
+        String fen;
+        String ponder;
+        String comment;
     }
 
 }

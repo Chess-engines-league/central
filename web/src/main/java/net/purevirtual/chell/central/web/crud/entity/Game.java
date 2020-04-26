@@ -45,7 +45,7 @@ public class Game {
         if (boardState == null || boardState.isBlank()) {
             return new ArrayList<>();
         }
-        return Stream.of(boardState.split("\\s+")).filter(s -> !s.isBlank()).collect(Collectors.toList());
+        return getBoardState().getBoardMoves().stream().map(bm->bm.getMove()).collect(Collectors.toList());
     }
 
     public Integer getId() {

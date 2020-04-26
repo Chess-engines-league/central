@@ -5,6 +5,11 @@
         <title>Game [[${game.id}]] - Chess Engine League</title>
         <script src="/static/chessboardjs/js/chessboard-1.0.0.js"></script>
         <link rel="stylesheet"  href="/static/chessboardjs/css/chessboard-1.0.0.css" />
+        <style type="text/css">
+            #moveList td.selected {
+                background-color: yellow;
+            }
+        </style>
     </head>
     <body>
         <div th:replace="layout :: navbar"></div>
@@ -66,42 +71,82 @@
                 </div>
                 <div class="col-sm-4">
                     <p >Moves</p>
-                    <p th:text="${game.boardState}" />
+                    <p id="moveInfo" />
+                    <table id="moveList">
+                        <tr>
+                            <th>#</th>
+                            <th>white</th>
+                            <th>black</th>
+                            <th>#</th>
+                            <th>white</th>
+                            <th>black</th>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </div>
         <script type="text/javascript" th:inline="javascript">
-            var fenList = /*[(${fenList})]*/ ['f2f4'];
+            var fenList = /*[(${fenListJson})]*/ ['f2f4'];
             var currentMove = 1;
-            var board;
-            if (fenList.length > 0) {
-                board = Chessboard('myBoard', fenList[0]);
-            } else {
-                board = Chessboard('myBoard');
+            var board = Chessboard('myBoard', fenList[0]['fen']);
+              // Get a reference to the table
+            let tableRef = document.getElementById("moveList");
+            function newCell(row, value, halfMove) {
+                let newCell = row.insertCell();
+                let newText = document.createTextNode(value);
+                newCell.appendChild(newText);
+                if(halfMove) {
+                    newCell.setAttribute("data-halfmove", halfMove);
+                }
+            }
+            for (var i = 1; i < fenList.length; i=i+4) {
+                let newRow = tableRef.insertRow();
+                for(var j=0;j<=1;j++) {
+                    var halfMove = i+2*j;
+                    var wholeMove = (halfMove+1)/2;
+                    if(halfMove < fenList.length)  {
+                        newCell(newRow, wholeMove);
+                        newCell(newRow, fenList[halfMove]['move'], halfMove);
+                        if(halfMove + 1<fenList.length) {
+                            newCell(newRow, fenList[halfMove + 1]['move'], halfMove + 1);
+                        }
+                    }
+                }
+            }
+            function updateMove() {
+                let move = fenList[currentMove];
+                board.position(move['fen'], false);
+                $("#moveList td").removeClass("selected");
+                $("#moveList td[data-halfmove="+currentMove+"]").addClass("selected");
+                var text = "";
+                if(move['ponder'] !== undefined) {
+                    text = text + "expected opponent move="+move['ponder']+" ";
+                }
+                if(move['comment'] !== undefined) {
+                    text = text + "comment="+move['comment'];
+                }
+                $("#moveInfo").text(text);
+                return false;
             }
             function next() {
-                if (currentMove < fenList.length) {
+                if (currentMove < fenList.length -1 ) {
                     currentMove++;
                 }
-                board.position(fenList[currentMove - 1], false);
-                return false;
+                return updateMove();
             }
             function previous() {
                 if (currentMove > 1) {
                     currentMove--;
                 }
-                board.position(fenList[currentMove - 1], false);
-                return false;
+                return updateMove();
             }
             function first() {
-                currentMove = 1;
-                board.position(fenList[currentMove - 1], false);
-                return false;
+                currentMove = 0;
+                return updateMove();
             }
             function last() {
-                currentMove = fenList.length;
-                board.position(fenList[currentMove - 1], false);
-                return false;
+                currentMove = fenList.length-1;
+                return updateMove();
             }
         </script>
     </body>

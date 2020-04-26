@@ -61,10 +61,14 @@ public class UciAgent implements IAgent {
         switch (cmd) {
             case "bestmove":
                 String move = parts[1];
-                String comment = Stream.of(parts).skip(1).collect(Collectors.joining(" "));
                 BoardMove boardMove = new BoardMove();
                 boardMove.setMove(move);
-                boardMove.setComment(comment);
+                if (parts.length == 4 && "ponder".equals(parts[2])) {
+                    boardMove.setPonder(move);
+                } else {
+                    String comment = Stream.of(parts).skip(2).collect(Collectors.joining(" "));
+                    boardMove.setComment(comment);
+                }
                 // TODO: make this configurable
                 //remote.send("go ponder");
                 moveFutures.forEach(f -> f.complete(boardMove));

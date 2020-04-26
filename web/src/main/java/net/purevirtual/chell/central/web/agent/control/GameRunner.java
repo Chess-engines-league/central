@@ -127,7 +127,7 @@ public class GameRunner {
         final BoardState boardState = new BoardState();
         boardState.setBoardMoves(game.getMoves());
         gameManager.updateBoardState(game.getGame(), boardState);
-        logger.info("all moves after {} move: {}", side, game.getMoves());
+        logger.info("all moves after {} move: {}", side, game.getRawMoves());
         return isDone(game.getMovesString(), side);
     }
 
