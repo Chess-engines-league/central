@@ -51,7 +51,7 @@ public class GithubCallback {
             AccessTokenResponse response = client.target("https://github.com/login/oauth/access_token")
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.json(request), AccessTokenResponse.class);
-            logger.info("gitHub response:" + response);
+            logger.info("gitHub response: {}", response);
 
             GitHubClient apiClient = new GitHubClient();
             apiClient.setOAuth2Token(response.accessToken);
@@ -82,6 +82,7 @@ public class GithubCallback {
         private String clientId;
         @JsonbProperty(value = "client_secret")
         private String clientSecret;
+        @JsonbProperty(value = "code")
         private String code;
     }
 

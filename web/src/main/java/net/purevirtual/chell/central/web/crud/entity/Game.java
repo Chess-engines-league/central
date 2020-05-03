@@ -101,4 +101,27 @@ public class Game {
     }
     
     
+    public int getPlayer1Score() {
+        if (result == GameResult.WHITE) {
+            if (isWhitePlayedByFirstAgent()) {
+                return 2;
+            } else {
+                return 0;
+            }
+        }
+        if (result == GameResult.BLACK) {
+            if (isWhitePlayedByFirstAgent()) {
+                return 0;
+            } else {
+                return 2;
+            }
+        }
+        //DRAW
+        return 1;
+    }
+    
+    public int getPlayer2Score() {
+        return 2 - getPlayer1Score();
+    }
+    
 }

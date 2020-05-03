@@ -1,7 +1,6 @@
 package net.purevirtual.chell.central.web.boundary;
 
 import java.io.IOException;
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -9,10 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-//import javax.ws.rs.GET;
-//import javax.ws.rs.Path;
-//import javax.ws.rs.core.MediaType;
-//import javax.ws.rs.core.Response;
 import net.purevirtual.chell.central.web.entity.Config;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
@@ -27,11 +22,6 @@ public class IndexPage extends HttpServlet {
 
     @Inject
     private Config config;
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        throw new IllegalStateException();
-    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

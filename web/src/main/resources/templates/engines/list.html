@@ -23,7 +23,7 @@
                     <td><th:block th:if="${engine.online}">✔</th:block></td>
                     <td><th:block th:if="${engine.game != null}">
                             Playing game <a th:href="${'/gui/games/'+ engine.game.id}" th:text="${engine.game.id}"/> 
-                            in match <a th:href="${'/gui/match/'+ engine.match.id}" th:text="${engine.match.id}"/>
+                            in match <a th:href="${'/gui/matches/'+ engine.match.id}" th:text="${engine.match.id}"/>
                     </th:block></td>
                     
                 </tr>

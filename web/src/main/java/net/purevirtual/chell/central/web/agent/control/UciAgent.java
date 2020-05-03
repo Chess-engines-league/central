@@ -1,11 +1,11 @@
 package net.purevirtual.chell.central.web.agent.control;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
@@ -19,12 +19,10 @@ public class UciAgent implements IAgent {
     private static final Logger logger = LoggerFactory.getLogger(UciAgent.class);
     private final AgentInput remote;
     private State state;
-    private Engine agentEntity;
-    private final ReentrantLock mutex = new ReentrantLock();
+    private final Engine agentEntity;
     private LiveGame liveGame;
-    // FIXME: maybe optional or normal variables instead of lists?
-    private List<CompletableFuture<Void>> readyFutures = new ArrayList<>();
-    private List<CompletableFuture<BoardMove>> moveFutures = new ArrayList<>();
+    private final CompletableFutures<Void> readyFutures = new CompletableFutures();
+    private final CompletableFutures<BoardMove> moveFutures = new CompletableFutures<>();
     private LocalDateTime lastMessage = null;
     public UciAgent(AgentInput remote, Engine agentEntity) {
         this.remote = remote;
@@ -34,7 +32,7 @@ public class UciAgent implements IAgent {
     }
     
     public void heartbeat(int seconds) {
-        if (lastMessage== null ||lastMessage.plusSeconds(seconds).isBefore(LocalDateTime.now())) {
+        if (lastMessage == null ||lastMessage.plusSeconds(seconds).isBefore(LocalDateTime.now())) {
             remote.heartbeat();
         }
     }
@@ -48,12 +46,11 @@ public class UciAgent implements IAgent {
             remote.send("position startpos moves " + String.join(" ", movesSoFar));
         }
         remote.send("go movetime "+moveTimeLimit);
-        CompletableFuture<BoardMove> moveFuture = new CompletableFuture<>();
-        moveFutures.add(moveFuture);
-        return moveFuture;
+        return moveFutures.addNew();
     }
 
     public void onMessage(String message) {
+        lastMessage = LocalDateTime.now();
         String[] parts = message.split("\\s+");
         if (parts.length == 0) {
             return;
@@ -72,8 +69,7 @@ public class UciAgent implements IAgent {
                 }
                 // TODO: make this configurable
                 //remote.send("go ponder");
-                moveFutures.forEach(f -> f.complete(boardMove));
-                moveFutures.clear();
+                moveFutures.complete(boardMove);
                 break;
             case "info":
                 logger.debug(message);
@@ -84,8 +80,7 @@ public class UciAgent implements IAgent {
                 remote.send("ucinewgame", "isready");
                 break;
             case "readyok":
-                readyFutures.forEach(f -> f.complete(null));
-                readyFutures.clear();
+                readyFutures.complete(null);
 
                 break;
             default:
@@ -103,9 +98,7 @@ public class UciAgent implements IAgent {
         state = State.WAIT_FOR_READY_OK;
         sendOptions(engineConfig);
         remote.send("ucinewgame", "isready");
-        CompletableFuture<Void> readyFuture = new CompletableFuture<>();
-        readyFutures.add(readyFuture);
-        return readyFuture;
+        return readyFutures.addNew();
         
     }
     
@@ -155,6 +148,31 @@ public class UciAgent implements IAgent {
         return Optional.ofNullable(this.liveGame);
     }
 
+    private static class CompletableFutures<T> {
+        private final Queue<CompletableFuture<T>> futures = new ArrayDeque<>();
+
+        private void add(CompletableFuture<T> readyFuture) {
+            futures.add(readyFuture);
+        }
+        
+        private CompletableFuture<T> addNew() {
+            CompletableFuture<T> readyFuture = new CompletableFuture<>();
+            futures.add(readyFuture);
+            return readyFuture;
+        }
+        
+        private void complete(T result) {
+            while(true) {
+                CompletableFuture<T> future = futures.poll();
+                if (future == null) {
+                    break;
+                }
+                future.complete(result);
+            }
+        }
+        
+    }
+    
     enum State {
         WAIT_FOR_UCI_OK,
         WAIT_FOR_READY_OK,
