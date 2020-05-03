@@ -1,7 +1,8 @@
 package net.purevirtual.chell.central.web.boundary;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import javax.inject.Inject;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
@@ -24,6 +25,9 @@ public class MatchPageTest {
     
     @Mock
     private GameManager gameManager;
+    
+    @Mock
+    private EngineManager engineManager;
     
     @InjectMocks
     private MatchPage sut = new MatchPage();
@@ -63,6 +67,16 @@ public class MatchPageTest {
     public void testList() {
         System.out.println("list");
         String result = sut.list();
+        assertTrue(!result.isBlank());
+    }
+    
+        
+    @Test
+    public void testNewMatch() {
+        ArrayList<Engine> engines = new ArrayList<>();
+        engines.add(new Engine());
+        when(engineManager.findAll()).thenReturn(engines);
+        String result = sut.newMatch();
         assertTrue(!result.isBlank());
     }
     

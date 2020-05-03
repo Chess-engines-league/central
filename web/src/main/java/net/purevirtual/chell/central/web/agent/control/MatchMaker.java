@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.util.Objects;
 import javax.inject.Inject;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 
@@ -19,6 +20,8 @@ public class MatchMaker {
     private GameManager matchgameManager;
 
     public Match newMatch(EngineConfig player1, EngineConfig player2, int gameCount) {
+        Objects.requireNonNull(player1, "player1");
+        Objects.requireNonNull(player2, "player2");
         Match match = new Match();
         match.setPlayer1(player1);
         match.setPlayer2(player2);

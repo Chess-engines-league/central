@@ -20,12 +20,22 @@ public class EngineConfigManager {
     private EntityManager entityManager;
 
     public EngineConfig get(Integer id) {
-        return entityManager.find(EngineConfig.class, id);
+        EngineConfig find = entityManager.find(EngineConfig.class, id);
+        if (find == null) {
+            throw new IllegalArgumentException("No such EngineConfig = " + id);
+        }
+        return find;
     }
 
     public EngineConfig save(EngineConfig engineConfig) {
         entityManager.persist(engineConfig);
         return engineConfig;
+    }
+
+    public List<EngineConfig> findByEngine(int engineId) {
+        return entityManager.createQuery("select eg from EngineConfig eg where eg.engine.id=:engineId")
+                .setParameter("engineId", engineId)
+                .getResultList();
     }
 
 }

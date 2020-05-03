@@ -9,7 +9,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import net.purevirtual.chell.central.web.agent.control.LiveAgentsManager;
 import net.purevirtual.chell.central.web.agent.control.MatchMaker;
-import net.purevirtual.chell.central.web.crud.control.AgentManager;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.EngineConfigManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
@@ -21,7 +21,7 @@ public class GameResource {
     private LiveAgentsManager liveAgentsManager;
     
     @Inject
-    private AgentManager agentManager;
+    private EngineManager agentManager;
     
     @Inject
     private EngineConfigManager engineConfigManager;

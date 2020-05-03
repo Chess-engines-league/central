@@ -12,4 +12,8 @@
         <exception-type>java.lang.Exception</exception-type> 
         <location>/errorHandler</location> 
     </error-page>
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>text/javascript</mime-type>
+    </mime-mapping>
 </web-app>

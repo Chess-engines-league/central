@@ -9,7 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import net.purevirtual.chell.central.web.crud.control.AgentManager;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 
@@ -19,7 +19,7 @@ public class EnginePage extends PageResource {
 
     
     @Inject
-    private AgentManager agentManager;
+    private EngineManager agentManager;
     
     
     

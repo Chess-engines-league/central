@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-public class AgentManager {
+public class EngineManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(AgentManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(EngineManager.class);
 
     @PersistenceContext
     private EntityManager entityManager;

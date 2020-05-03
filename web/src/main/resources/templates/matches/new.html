@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="layout :: head"></th:block>
+        <title>New Match</title>
+    </head>
+    <body>
+        <div th:replace="layout :: navbar"></div>
+        <div class="container bg-secondary">
+            <h2>New Match</h2>
+            <form action="/gui/matches/new" method="POST" enctype="application/x-www-form-urlencoded">
+                <table>
+                    <tr>
+                        <th>
+                            Player 1
+                        </th>
+                        <td>
+                            <select id="engine1" required="required">
+                                <option  th:each="engine:${engines}" value="123" th:value=${engine.id} th:text="${engine.name}">
+                                    Engine Name
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="engineConfig1" name="engineConfig1" required="required">
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Player 2
+                        </th>
+                        <td>
+                            <select id="engine2" required="required">
+                                <option  th:each="engine:${engines}" value="123" th:value=${engine.id} th:text="${engine.name}">
+                                    Engine Name
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select id="engineConfig2" name="engineConfig2" required="required">
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Games in match
+                        </th>
+                        <td colspan="2">
+                            <input name="games" type="number" min="2" max="100" value="8"/>
+                        </td>
+                    </tr>
+                </table>
+                <button>Start</button>
+            </form>
+            <script type="text/javascript" >
+                var onEngineSelect = function(engine, engineConfig) {
+                    engine.on("change", function() {
+                        engineConfig.empty();
+                        let id = engine.val();
+                        if(id){
+                            $.getJSON("/rest/engines/"+id+"/configs", function(data) {
+                                $.each(data,function(index,json){
+                                    engineConfig.append($("<option></option>").attr("value", json.id).text(json.name));
+                                });     
+                            })
+                        }
+                    }).trigger('change');
+                };
+                onEngineSelect($("#engine1"), $("#engineConfig1"));
+                onEngineSelect($("#engine2"), $("#engineConfig2"));
+            </script>
+        </div>
+    </body>
+</html>

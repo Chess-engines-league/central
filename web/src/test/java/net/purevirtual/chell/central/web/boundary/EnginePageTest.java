@@ -1,7 +1,7 @@
 package net.purevirtual.chell.central.web.boundary;
 
 import java.util.Collections;
-import net.purevirtual.chell.central.web.crud.control.AgentManager;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
@@ -24,7 +24,7 @@ public class EnginePageTest {
     private GameManager gameManager;
     
     @Mock
-    private AgentManager agentManager;
+    private EngineManager agentManager;
     
     @InjectMocks
     private EnginePage sut = new EnginePage();

@@ -14,7 +14,7 @@ import javax.websocket.server.PathParam;
 import net.purevirtual.chell.central.web.agent.control.LiveAgentsManager;
 import net.purevirtual.chell.central.web.agent.control.UciAgent;
 import net.purevirtual.chell.central.web.agent.control.WsAgentInput;
-import net.purevirtual.chell.central.web.crud.control.AgentManager;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class UciWebSocketEndPoint {
     private LiveAgentsManager agentsManager;
     
     @Inject
-    private AgentManager agentManager;
+    private EngineManager agentManager;
 
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) {
