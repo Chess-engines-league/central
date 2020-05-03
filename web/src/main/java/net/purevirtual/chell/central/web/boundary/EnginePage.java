@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.boundary;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,15 +70,20 @@ public class EnginePage extends PageResource {
         public String name;
         public EngineType type;
         public int id;
-        public Engine engine;
+        public String lastConnected;
+        public String host;
         public boolean online;
         public Game game = null;
         public Match match = null;
         public EngineDto(Engine engine) {
-            this.engine = engine;
+            lastConnected = "";
+            if (engine.getLastConnected()!= null) {
+                lastConnected = engine.getLastConnected().format(DateTimeFormatter.ISO_DATE_TIME);
+            }
             name = engine.getName();
             id = engine.getId();
             type = engine.getType();
+            host = engine.getHost();
             liveAgentsManager.find(engine).ifPresentOrElse(agent -> {
                 this.online = true;
                 agent.getLiveGame().map(t -> t.getGame()).

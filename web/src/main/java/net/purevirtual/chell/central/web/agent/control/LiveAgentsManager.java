@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.TreeMap;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
+import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
@@ -19,6 +22,9 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class LiveAgentsManager {
     private static final Logger logger = LoggerFactory.getLogger(LiveAgentsManager.class);
+    
+    @Inject
+    private EngineManager engineManager;
 
     Map<String, UciAgent> agents = new TreeMap<>();
     // TODO: czy obslugiwac wiele sesji tego samego agenta?
@@ -35,6 +41,7 @@ public class LiveAgentsManager {
     public void register(String sessionId, UciAgent agent) {
         agents.put(sessionId, agent);
         agentsById.put(agent.getAgentEntity().getId(), agent);
+        engineManager.updateLastConnection(agent.getAgentEntity(), LocalDateTime.now());
     }
 
     public void unregister(String sessionId) {
@@ -50,8 +57,8 @@ public class LiveAgentsManager {
             logger.info("Hybrid agent has {} subagents", engine.getSubEngines());
             List<HybridAgent.HybridSubAgent> subAgents = new ArrayList<>();
             for (EngineConfig subEngine : engine.getSubEngines()) {
-                logger.info("Checking for {} if subengine is online {}", engine, subEngine);
-                UciAgent subAgent = agentsById.get(subEngine.getId());
+                logger.info("Checking for {} if subengine is online {}", engine.getId(), subEngine.getEngine().getId());
+                UciAgent subAgent = agentsById.get(subEngine.getEngine().getId());
                 if (subAgent == null) {
                     return Optional.empty();
                 }

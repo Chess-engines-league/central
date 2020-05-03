@@ -1,8 +1,12 @@
 package net.purevirtual.chell.central.web.crud.control;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
@@ -28,8 +32,16 @@ public class EngineManager {
     }
     
     public List<Engine> findAll() {
-        return entityManager.createQuery("select e from Engine e", Engine.class)
+        return entityManager.createQuery("select e from Engine e order by e.id", Engine.class)
                 .getResultList();
     }
 
+    @Asynchronous
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public void updateLastConnection(Engine agentEntity, LocalDateTime date) {
+        Engine fresh = get(agentEntity.getId());
+        fresh.setLastConnected(date);
+        entityManager.merge(fresh);
+    }
+    
 }

@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,16 +29,18 @@ public class Engine {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "agent_id_seq")
     @Column(updatable = false)
     private Integer id;
-        
+
     private String token;
     private String name;
+    private String host;
+    private LocalDateTime lastConnected;
     @Enumerated(EnumType.STRING)
     private EngineType type;
-    
+
     @OrderBy("id ASC")
     @OneToMany(mappedBy = "engine", fetch = FetchType.EAGER)
     private Set<EngineConfig> configs;
-    
+
     //@OrderColumn(name = "order")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "subengines")
@@ -87,6 +90,22 @@ public class Engine {
     public Set<EngineConfig> getConfigs() {
         return configs;
     }
-    
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public LocalDateTime getLastConnected() {
+        return lastConnected;
+    }
+
+    public void setLastConnected(LocalDateTime lastConnected) {
+        this.lastConnected = lastConnected;
+    }
+
 
 }

@@ -18,6 +18,7 @@ public class HybridAgent implements IAgent {
     
     private List<HybridSubAgent> subagents;
     private Engine engine;
+    private LiveGame liveGame = null;
     public HybridAgent(Engine engine, List<HybridSubAgent> subagents) {
         if(subagents.isEmpty()) {
             throw new IllegalArgumentException("Hybrid agent requires subAgents");
@@ -51,6 +52,7 @@ public class HybridAgent implements IAgent {
         }
         if(success) {
             logger.info("assigned game to subEngines {}", subagents);
+            liveGame = game;
             return true;
         } else {
             for (HybridSubAgent subagent : subagents) {
@@ -62,7 +64,7 @@ public class HybridAgent implements IAgent {
     
     @Override
     public synchronized Optional<LiveGame> getLiveGame() {
-        return subagents.get(0).agent.getLiveGame();
+        return Optional.ofNullable(liveGame);
     }
     
     @Override
@@ -70,6 +72,7 @@ public class HybridAgent implements IAgent {
         for (HybridSubAgent subagent : subagents) {
             subagent.agent.release(game);
         }
+        liveGame = game;
     }
 
     @Override
