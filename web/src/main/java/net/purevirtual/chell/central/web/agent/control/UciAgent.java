@@ -3,6 +3,7 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -125,6 +126,7 @@ public class UciAgent implements IAgent {
         return agentEntity;
     }
 
+    @Override
     public synchronized boolean assignGame(LiveGame game) throws InterruptedException {
         if (this.liveGame != null) {
             logger.info("agent {}: rejecting {}, already busy with game {}", this.agentEntity.getId(), game.getGame().getId(), this.liveGame.getGame().getId());
@@ -135,6 +137,7 @@ public class UciAgent implements IAgent {
         return true;
     }
 
+    @Override
     public synchronized void release(LiveGame game) {
         if (this.liveGame == game) {
             logger.info("agent {}: leaving game {}", this.agentEntity.getId(), liveGame.getGame().getId());
@@ -145,6 +148,11 @@ public class UciAgent implements IAgent {
     @Override
     public int getId() {
         return agentEntity.getId();
+    }
+
+    @Override
+    public synchronized Optional<LiveGame> getLiveGame() {
+        return Optional.ofNullable(this.liveGame);
     }
 
     enum State {

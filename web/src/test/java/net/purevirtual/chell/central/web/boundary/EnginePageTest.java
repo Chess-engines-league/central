@@ -1,6 +1,9 @@
 package net.purevirtual.chell.central.web.boundary;
 
 import java.util.Collections;
+import java.util.Optional;
+import javax.inject.Inject;
+import net.purevirtual.chell.central.web.agent.control.LiveAgentsManager;
 import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
@@ -26,16 +29,21 @@ public class EnginePageTest {
     @Mock
     private EngineManager agentManager;
     
+    @Mock
+    private LiveAgentsManager liveAgentsManager;
+    
     @InjectMocks
     private EnginePage sut = new EnginePage();
         
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        Engine agent = new Engine();
-        agent.setType(EngineType.OTHER);
-        when(agentManager.findAll()).thenReturn(Collections.singletonList(agent));
-        when(agentManager.get(any())).thenReturn(agent);
+        Engine engine = new Engine();
+        engine.setType(EngineType.OTHER);
+        engine.setId(123);
+        when(agentManager.findAll()).thenReturn(Collections.singletonList(engine));
+        when(agentManager.get(any())).thenReturn(engine);
+        when(liveAgentsManager.find(any())).thenReturn(Optional.empty());
     }
     
     @Test

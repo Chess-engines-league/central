@@ -13,11 +13,19 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Type</th>
+                    <th>Online</th>
+                    <th>Active game</th>
                 </tr>
                 <tr th:each="engine: ${engines}">
                     <td><a th:href="${'/gui/engines/'+ engine.id}" th:text="${engine.id}"/></td>
                     <td><a th:href="${'/gui/engines/'+ engine.id}" th:text="${engine.name}"/></td>
-                    <td th:text="${engine.type}"></td>
+                    <td th:text="${engine.type}">engine type</td>
+                    <td><th:block th:if="${engine.online}">✔</th:block></td>
+                    <td><th:block th:if="${engine.game != null}">
+                            Playing game <a th:href="${'/gui/games/'+ engine.game.id}" th:text="${engine.game.id}"/> 
+                            in match <a th:href="${'/gui/match/'+ engine.match.id}" th:text="${engine.match.id}"/>
+                    </th:block></td>
+                    
                 </tr>
             </table>    
 

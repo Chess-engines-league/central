@@ -7,8 +7,7 @@ public enum EngineType {
     HYBRID("HYBRID"),
     LC0("Leela Chess Zero"),
     OTHER("Other"),
-    STOCKFISH8("Stockfish 8"),
-    STOCKFISH9("Stockfish 9"),
+    STOCKFISH("Stockfish"),
     TOGA2("Toga II");
 
     private final String name;

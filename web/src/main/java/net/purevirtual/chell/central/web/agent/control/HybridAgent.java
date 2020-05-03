@@ -2,6 +2,7 @@ package net.purevirtual.chell.central.web.agent.control;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -59,6 +60,11 @@ public class HybridAgent implements IAgent {
             }    
             return false;
         }
+    }
+    
+    @Override
+    public synchronized Optional<LiveGame> getLiveGame() {
+        return subagents.get(0).agent.getLiveGame();
     }
     
     @Override
