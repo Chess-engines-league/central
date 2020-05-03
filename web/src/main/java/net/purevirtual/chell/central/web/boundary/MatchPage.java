@@ -84,7 +84,7 @@ public class MatchPage extends PageResource {
                     }
                     return new GameWithScore(game, score1, score2);
                 }).collect(Collectors.toList());
-        Map<String, Object> context = new HashMap();
+        var context = newModel();
         context.put("match", match);
         context.put("player1", match.getPlayer1());
         context.put("player2", match.getPlayer2());
@@ -96,7 +96,7 @@ public class MatchPage extends PageResource {
     @Path("/new")
     public String newMatch() {
         List<Engine> engines = engineManager.findAll();
-        Map<String, Object> context = new HashMap();
+        var context = newModel();
         context.put("engines", engines);
         return getTemplateEngine().process("matches/new", new Context(null, context));
     }
@@ -121,7 +121,7 @@ public class MatchPage extends PageResource {
     @GET
     public String list() {
         List<Match> matches = matchManager.findAll();
-        Map<String, Object> context = new HashMap();
+        var context = newModel();
 
         context.put("matches", matches);
         return getTemplateEngine().process("matches/list", new Context(null, context));

@@ -36,5 +36,9 @@ public abstract class PageResource {
     protected String process(String template, Map<String, Object> context) {
         return templateEngine.process(template, new org.thymeleaf.context.Context(null, context));
     }
+    
+    protected Map<String, Object> newModel() {
+        return new HashMap<>();
+    }
 
 }

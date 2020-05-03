@@ -3,10 +3,8 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
@@ -88,7 +86,7 @@ public class HybridAgent implements IAgent {
                 for (CompletableFuture<BoardMove> future : futures) {
                     moves.add(future.get());
                 }
-                BoardMove selectMove = new HybridSelect().selectMove(HybridType.VOTE_ELO, moves, subagents);
+                BoardMove selectMove = HybridSelect.selectMove(HybridType.VOTE_ELO, moves, subagents);
                 logger.info("Selected move {} out of {}", selectMove, moves);
                 return selectMove;
             } catch (ExecutionException ex) {

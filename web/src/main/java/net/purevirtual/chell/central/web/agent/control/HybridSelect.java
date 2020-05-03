@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
@@ -13,11 +14,11 @@ import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 
 public class HybridSelect {
 
-    public BoardMove selectMove(HybridType type, List<BoardMove> moves, List<HybridAgent.HybridSubAgent> subagents) {
+    public static BoardMove selectMove(HybridType type, List<BoardMove> moves, List<HybridAgent.HybridSubAgent> subagents) {
         String allOptions = moves.stream().map(m -> '"' + m.getMove() + '"').collect(Collectors.joining(", ", "[", "]"));
         switch (type) {
             case RANDOM:
-                int choice = new Random().nextInt(moves.size());
+                int choice = random().nextInt(moves.size());
                 return make(moves.get(choice).getMove(), "Selected move by random from: " + allOptions);
             case VOTE:
                 Map<String, List<BoardMove>> moveCount = moves.stream().collect(Collectors.groupingBy(t -> t.getMove()));
@@ -38,7 +39,11 @@ public class HybridSelect {
         }
     }
     
-    private BoardMove elect(Map<String, Integer> weightedVotes, String allOptions) {
+    private static Random random() {
+        return ThreadLocalRandom.current();
+    }
+    
+    private static BoardMove elect(Map<String, Integer> weightedVotes, String allOptions) {
         if (weightedVotes.size() == 1) {
             return make(weightedVotes.keySet().iterator().next(), "Selected move by unanimous vote");
         }
@@ -60,13 +65,13 @@ public class HybridSelect {
             return make(p1, "Selected move by vote from " + allOptions);
         } else {
             tied.add(p1);
-            int choice = new Random().nextInt(tied.size());
+            int choice = random().nextInt(tied.size());
             return make(tied.get(choice), "Selected move by vote with random tie-break from " + allOptions);
         }
         
     }
     
-    private BoardMove make(BoardMove move, String comment) {
+    private static BoardMove make(BoardMove move, String comment) {
         BoardMove bm = new BoardMove();
         bm.setMove(move.getMove());
         bm.setMove(move.getPonder());
@@ -74,14 +79,14 @@ public class HybridSelect {
         return bm;
     }
     
-    private BoardMove make(String move, String comment) {
+    private static BoardMove make(String move, String comment) {
         BoardMove bm = new BoardMove();
         bm.setMove(move);
         bm.setComment(comment);
         return bm;
     }
     
-    public String randomWeight(Map<String, Integer> weightedVotes) {
+    public static String randomWeight(Map<String, Integer> weightedVotes) {
         List<String> moves = new ArrayList<>();
         List<Integer> weights = new ArrayList<>();
         weightedVotes.forEach((move,weight)-> {
@@ -91,12 +96,12 @@ public class HybridSelect {
         return randomWeight(moves, weights);
     }
  
-    public <T> T randomWeight(List<T> items, List<Integer> weights) {
+    public static <T> T randomWeight(List<T> items, List<Integer> weights) {
         long completeWeight = 0L;
         for (Integer weight : weights) {
             completeWeight += weight;
         }
-        long r = (long) (Math.random() * completeWeight);
+        long r = (long) (random().nextDouble() * completeWeight);
         long countWeight = 0;
         for (int i = 0; i < items.size(); i++) {
             countWeight += weights.get(i);

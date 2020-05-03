@@ -50,7 +50,7 @@ public class EnginePage extends PageResource {
             }
             connectionCommand = "websocat -v --text -S cmd:'"+cmd+"' wss://chell.purevirtual.net:443/agent/uci/" + engine.getToken();
         }
-        Map<String, Object> context = new HashMap();
+        var context = newModel();
         context.put("engine", engine);
         context.put("connectionCommand", connectionCommand);
         return process("engines/engine", context);
@@ -60,7 +60,7 @@ public class EnginePage extends PageResource {
     @GET
     public String list() {
         List<EngineDto> engines = agentManager.findAll().stream().map(EngineDto::new).collect(Collectors.toList());
-        Map<String, Object> context = new HashMap();
+        var context = newModel();
         context.put("engines", engines);
         return process("engines/list", context);
     }
