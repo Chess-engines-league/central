@@ -58,6 +58,21 @@
                     </tr>
                 </table>    
             </div>
+            <div th:if="${engine.type.name() == 'HYBRID'}">
+                Configurations:
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Move selection</th>
+                    </tr>
+                    <tr th:each="config: ${engine.configs}">
+                        <td th:text="${config.id}"></td>
+                        <td th:text="${config.description}"></td>
+                        <td th:text="${config.hybridConfig.type}"></td>
+                    </tr>
+                </table>    
+            </div>
         </div>
     </body>
 </html>

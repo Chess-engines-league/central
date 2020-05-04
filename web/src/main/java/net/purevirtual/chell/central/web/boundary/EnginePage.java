@@ -51,9 +51,13 @@ public class EnginePage extends PageResource {
             }
             connectionCommand = "websocat -v --text -S cmd:'"+cmd+"' wss://chell.purevirtual.net:443/agent/uci/" + engine.getToken();
         }
+        
         var context = newModel();
         context.put("engine", engine);
         context.put("connectionCommand", connectionCommand);
+        if(engine.getType()==EngineType.HYBRID) {
+            //context.put("hybridConfig", engine.get);
+        }
         return process("engines/engine", context);
     }
 

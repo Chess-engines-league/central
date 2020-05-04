@@ -19,6 +19,7 @@ public class HybridAgent implements IAgent {
     private List<HybridSubAgent> subagents;
     private Engine engine;
     private LiveGame liveGame = null;
+    private EngineConfig engineConfig = null;
     public HybridAgent(Engine engine, List<HybridSubAgent> subagents) {
         if(subagents.isEmpty()) {
             throw new IllegalArgumentException("Hybrid agent requires subAgents");
@@ -87,7 +88,11 @@ public class HybridAgent implements IAgent {
                 for (CompletableFuture<BoardMove> future : futures) {
                     moves.add(future.get());
                 }
-                BoardMove selectMove = HybridSelect.selectMove(HybridType.VOTE_ELO, moves, subagents);
+                HybridType selectType = HybridType.VOTE_ELO;
+                if(engineConfig != null) {
+                    selectType = engineConfig.getHybridConfig().getType();
+                }
+                BoardMove selectMove = HybridSelect.selectMove(selectType, moves, subagents);
                 logger.info("Selected move {} out of {}", selectMove, moves);
                 return selectMove;
             } catch (ExecutionException ex) {
@@ -101,6 +106,7 @@ public class HybridAgent implements IAgent {
 
     @Override
     public CompletableFuture<Void> reset(EngineConfig engineConfig) {
+        this.engineConfig = engineConfig;
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for (HybridSubAgent subagent : subagents) {
             futures.add(subagent.agent.reset(subagent.engineConfig));

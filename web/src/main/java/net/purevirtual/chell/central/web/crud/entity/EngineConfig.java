@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import com.google.gson.Gson;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
+import net.purevirtual.chell.central.web.crud.entity.dto.HybridEngineOptions;
 
 @Entity
 public class EngineConfig {
@@ -58,6 +60,10 @@ public class EngineConfig {
 
     public void setInitOptions(String initOptions) {
         this.initOptions = initOptions;
+    }
+    
+    public HybridEngineOptions getHybridConfig() {
+        return new Gson().fromJson(getInitOptions(), HybridEngineOptions.class);
     }
 
     public int getElo() {
