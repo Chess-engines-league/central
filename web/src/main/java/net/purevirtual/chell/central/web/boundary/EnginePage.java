@@ -25,6 +25,7 @@ import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.slf4j.Logger;
@@ -100,7 +101,7 @@ public class EnginePage extends PageResource {
     
     @POST
     @Path("/newHybrid")
-    //@TransactionAttribute(TransactionAttributeType.REQUIRED)
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response newMatchSubmitSubmit(@FormParam("engineConfigIds") String ids,
             @FormParam("name") String name,
@@ -112,13 +113,14 @@ public class EnginePage extends PageResource {
         engine.setName(name);
         engine.setHost(host);
         engine.setType(EngineType.HYBRID);
+        engineManager.save(engine);
         Stream.of(ids.split(";")).forEachOrdered(engineConfigId-> {
             logger.info("engineConfigId={}", engineConfigId);
             EngineConfig subEngine = engineConfigManager.get(Integer.parseInt(engineConfigId));
-            subEngine.getHybridEngines().add(engine);
-            engine.getSubEngines().add(subEngine);
+            engineConfigManager.save(new SubEnginesRelation(engine, subEngine));
+//            subEngine.getHybridEngines().add(engine);
+//            engineConfigManager.update(subEngine);
         });
-        engineManager.save(engine);
         Stream.of(HybridType.values()).forEachOrdered(type-> {
             EngineConfig eg = new EngineConfig();
             eg.setElo(1200);

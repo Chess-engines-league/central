@@ -35,16 +35,6 @@ public class EngineConfig {
     private String initOptions;
     private int elo;
     
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subEngines")
-    private Set<Engine> hybridEngines;
-
-    public Set<Engine> getHybridEngines() {
-        if (hybridEngines == null) {
-            hybridEngines = new HashSet<>();
-        }
-        return hybridEngines;
-    }
-
     public Integer getId() {
         return id;
     }

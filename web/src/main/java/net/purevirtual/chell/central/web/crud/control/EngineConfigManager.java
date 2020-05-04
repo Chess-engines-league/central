@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +26,6 @@ public class EngineConfigManager {
         if (find == null) {
             throw new IllegalArgumentException("No such EngineConfig = " + id);
         }
-        // todo: fetch join
-        find.getHybridEngines().size();
         return find;
     }
 
@@ -39,6 +38,18 @@ public class EngineConfigManager {
         return entityManager.createQuery("select eg from EngineConfig eg where eg.engine.id=:engineId")
                 .setParameter("engineId", engineId)
                 .getResultList();
+    }
+
+    public void update(EngineConfig subEngine) {
+        entityManager.merge(subEngine);
+    }
+    
+    public void update(SubEnginesRelation relation) {
+        entityManager.merge(relation);
+    }
+
+    public void save(SubEnginesRelation subEngine) {
+        entityManager.persist(subEngine);
     }
 
 }
