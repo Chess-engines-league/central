@@ -13,14 +13,28 @@
 
             <table>
                 <tr>
-                    <th>ID</th>
-                    <th>Status</th>
-                    <th>Result</th>
+                    <th rowspan="2">ID</th>
+                    <th rowspan="2">Status</th>
+                    <th colspan="3">Player 1</th>                    
+                    <th colspan="3">Player 2</th>
+                </tr>
+                <tr>
+                    <th>Score</th>
+                    <th>Engine</th>
+                    <th>Configuration</th>
+                    <th>Score</th>
+                    <th>Engine</th>
+                    <th>Configuration</th>
                 </tr>
                 <tr th:each="match: ${matches}">
                     <td><a th:href="${'/gui/matches/' + match.id}" th:text="${match.id}"/></td>
                     <td><a th:href="${'/gui/matches/' + match.id}" th:text="${match.state}"/></td>
-                    <td th:text="${match.result}" />
+                    <td th:text="${match.score1}"/>
+                    <td><a th:href="${'/gui/engines/'+ match.player1.engine.id}" th:text="${match.player1.engine.name+' ('+match.player1.engine.id+')'}"/></td>
+                    <td th:text="${match.player1.description+' ('+match.player1.id+')'}"/>
+                    <td th:text="${match.score2}"/>
+                    <td><a th:href="${'/gui/engines/'+ match.player2.engine.id}" th:text="${match.player2.engine.name+' ('+match.player2.engine.id+')'}"/></td>
+                    <td th:text="${match.player2.description+' ('+match.player2.id+')'}"/>
                 </tr>
             </table>    
 

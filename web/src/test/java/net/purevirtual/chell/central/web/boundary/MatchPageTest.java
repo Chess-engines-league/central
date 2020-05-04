@@ -41,6 +41,7 @@ public class MatchPageTest {
         EngineConfig engineConfig = new EngineConfig();
         Engine engine = new Engine();
         engine.setName("name1");
+        engine.setId(234);
         engineConfig.setEngine(engine);
         engineConfig.setId(123);
         engineConfig.setDescription("desc 2");

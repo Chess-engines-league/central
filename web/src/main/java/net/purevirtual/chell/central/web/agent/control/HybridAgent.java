@@ -55,9 +55,7 @@ public class HybridAgent implements IAgent {
             liveGame = game;
             return true;
         } else {
-            for (HybridSubAgent subagent : subagents) {
-                subagent.agent.release(game);
-            }    
+            release(game);
             return false;
         }
     }
@@ -72,7 +70,7 @@ public class HybridAgent implements IAgent {
         for (HybridSubAgent subagent : subagents) {
             subagent.agent.release(game);
         }
-        liveGame = game;
+        liveGame = null;
     }
 
     @Override
