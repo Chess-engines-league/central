@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" th:remove="tag">
+    <head th:remove="all"><title>Engines</title></head>
+    <body th:remove="tag">
+        <table  th:remove="tag">
+            <tr>
+                <th>
+                    Engine
+                </th>
+                <td>
+                    <select class="engine" required="required">
+                        <option  th:each="engine:${engines}" value="123" th:value=${engine.id} th:text="${engine.name+' ('+engine.id+')'}">
+                            Engine Name
+                        </option>
+                    </select>
+                </td>
+                <td>
+                    <select class="engineConfig" required="required">
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>

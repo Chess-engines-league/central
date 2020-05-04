@@ -8,6 +8,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,8 @@ public class EngineConfigManager {
         if (find == null) {
             throw new IllegalArgumentException("No such EngineConfig = " + id);
         }
+        // todo: fetch join
+        find.getHybridEngines().size();
         return find;
     }
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="layout :: head"></th:block>
+        <title>New Match</title>
+    </head>
+    <body>
+        <div th:replace="layout :: navbar"></div>
+        <div class="container bg-secondary">
+            <h2>New Engine</h2>
+            <form action="/gui/engines/newHybrid" method="POST" enctype="application/x-www-form-urlencoded">
+                <p>Subengines:</p>
+                <table id="formTable">
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <td colspan="2">
+                            <input name="name" type="text" minlength="1" value="" required />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Host (optional)
+                        </th>
+                        <td colspan="2">
+                            <input name="host" type="text"/>
+                        </td>
+                    </tr>
+                </table>
+                <button onclick="addEngine();return false" type="button">Add engine</button><br />
+                <input name="engineConfigIds" type="hidden" value=""/>
+                <button onclick="return saveIds();">Create</button>
+            </form>
+            <script type="text/javascript" >
+                function saveIds(event) {
+                    var result=[];
+                    $(".engineConfig").each(function(index, elem ) {
+                       result.push($(elem).val());
+                    });
+                    console.log(result);
+                    $("[name=engineConfigIds]").val(result.join(";"));
+                    if(result.length>=2) {
+                        return true;
+                    } else {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+                var onEngineSelect = function(engine, engineConfig) {
+                    console.log(engine, engineConfig);
+                    engine.off('change').on("change", function() {
+                        engineConfig.empty();
+                        let id = engine.val();
+                        if(id){
+                            $.getJSON("/rest/engines/"+id+"/configs", function(data) {
+                                $.each(data,function(index,json){
+                                    engineConfig.append($("<option></option>").attr("value", json.id).text(json.name));
+                                });     
+                            })
+                        }
+                    }).trigger('change');
+                };
+                function addEngine() {
+                    $.get("/gui/engines/fragment/subEngine", function(responseText) {
+                        let formTable = document.getElementById("formTable");
+                        var newRow = document.createElement('tr');
+                        formTable.appendChild(newRow);
+                        newRow.outerHTML = responseText;
+                        $.each($('#formTable tr'), function( i, row ) {
+                            var engine = $(row).find('.engine');
+                            var engineConfig = $(row).find('.engineConfig');
+                            if(engine.length===1 && engineConfig.length===1) {
+                                onEngineSelect(engine, engineConfig);
+                            }
+                        });
+                        
+                    });
+                }
+
+                addEngine();
+                addEngine();
+            </script>
+        </div>
+    </body>
+</html>

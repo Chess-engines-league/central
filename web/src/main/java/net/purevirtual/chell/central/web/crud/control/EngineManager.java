@@ -43,5 +43,9 @@ public class EngineManager {
         fresh.setLastConnected(date);
         entityManager.merge(fresh);
     }
+
+    public void save(Engine engine) {
+        entityManager.persist(engine);
+    }
     
 }

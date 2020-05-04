@@ -1,9 +1,14 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
 import com.google.gson.Gson;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,6 +34,16 @@ public class EngineConfig {
     private String description;
     private String initOptions;
     private int elo;
+    
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "subEngines")
+    private Set<Engine> hybridEngines;
+
+    public Set<Engine> getHybridEngines() {
+        if (hybridEngines == null) {
+            hybridEngines = new HashSet<>();
+        }
+        return hybridEngines;
+    }
 
     public Integer getId() {
         return id;
