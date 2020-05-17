@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="layout :: head"></th:block>
+        <title>New Match</title>
+    </head>
+    <body>
+        <div th:replace="layout :: navbar"></div>
+        <div class="container bg-secondary">
+            <h2>New Engine</h2>
+            <form action="/gui/engines/new" method="POST" enctype="application/x-www-form-urlencoded">
+                <table id="formTable">
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <td colspan="2">
+                            <input name="name" type="text" minlength="1" value="" required />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Type
+                        </th>
+                        <td colspan="2">
+                            <select name="type" required="required">
+                                <option  th:each="type:${types}" th:value=${type} th:text="${type}">
+                                    Engine Type
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            Host (optional)
+                        </th>
+                        <td colspan="2">
+                            <input name="host" type="text"/>
+                        </td>
+                    </tr>
+                </table>
+                <button>Create</button>
+            </form>
+        </div>
+    </body>
+</html>

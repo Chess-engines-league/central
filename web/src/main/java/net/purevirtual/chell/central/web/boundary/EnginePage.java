@@ -28,6 +28,7 @@ import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.Context;
@@ -98,12 +99,20 @@ public class EnginePage extends PageResource {
         return getTemplateEngine().process("engines/newHybrid", new Context(null, context));
     }
     
+    @GET
+    @Path("/new")
+    public String newEngine() {
+        var context = newModel();
+        context.put("types", Stream.of(EngineType.values()).filter(t -> t != EngineType.HYBRID).collect(Collectors.toList()));
+        return getTemplateEngine().process("engines/new", new Context(null, context));
+    }
+    
     
     @POST
     @Path("/newHybrid")
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response newMatchSubmitSubmit(@FormParam("engineConfigIds") String ids,
+    public Response newHybridEngineSubmit(@FormParam("engineConfigIds") String ids,
             @FormParam("name") String name,
             @FormParam("host") String host
     ) throws URISyntaxException {
@@ -131,6 +140,34 @@ public class EnginePage extends PageResource {
             //engine.getConfigs().add(eg);
         });
                 
+        // relative to /gui
+        return Response.temporaryRedirect(new URI("/engines/" + engine.getId())).build();
+    }
+    
+    @POST
+    @Path("/new")
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public Response newEngineSubmit(
+            @FormParam("name") String name,
+            @FormParam("host") String host,
+            @FormParam("type") EngineType type
+    ) throws URISyntaxException {
+        logger.info("new name:{}, host: {}, type:{}",name, host, type);
+        Engine engine = new Engine();
+        engine.setName(name);
+        engine.setHost(host);
+        engine.setType(type);
+        engine.setToken(RandomStringUtils.randomAlphabetic(20));
+        engineManager.save(engine);
+        
+        
+        EngineConfig ec = new EngineConfig();
+        ec.setElo(1200);
+        ec.setEngine(engine);
+//        ec.setInitOptions("{\"type\":\"" + type.name() + "\"}");
+        ec.setDescription("default");
+        engineConfigManager.save(ec);      
         // relative to /gui
         return Response.temporaryRedirect(new URI("/engines/" + engine.getId())).build();
     }

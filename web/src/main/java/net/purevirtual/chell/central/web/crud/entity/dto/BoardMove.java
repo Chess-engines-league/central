@@ -34,5 +34,13 @@ public class BoardMove implements Serializable {
         this.comment = comment;
     }
     
+    public void appendComment(String comment) {
+        if (this.comment == null || this.comment.isBlank()) {
+            this.comment = comment;
+        } else {
+            this.comment = this.comment + "; " + comment;
+        }
+    }
+    
     
 }

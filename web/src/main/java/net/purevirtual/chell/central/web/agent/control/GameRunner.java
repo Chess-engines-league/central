@@ -123,7 +123,7 @@ public class GameRunner {
             return Optional.of(side.opponent().result());
         }
         Duration moveDuration = Duration.between(moveStart, Instant.now());
-        logger.info("{} received move in {}, expected: {}", side, moveDuration.toMillis(), moveLimit);
+        move.appendComment(String.format("received move in %d ms, limit: %d", moveDuration.toMillis(), moveLimit));
         if (!isLegal(game.getMovesString(), move.getMove())) {
             logger.info("{} illegal move:  {}", side, move);
             return Optional.of(side.opponent().result());
