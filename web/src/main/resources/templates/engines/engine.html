@@ -29,7 +29,19 @@
                 </tr>
                 <tr>
                     <th>Connection command</th>
-                    <td th:text="${connectionCommand}" />
+                    <td>
+                        <p th:text="${connectionCommand}" />
+                        <p> "websocat" can be downloaded from <a href="https://github.com/vi/websocat/releases/download/v1.5.0/websocat_amd64-linux-static">websocat_amd64-linux-static</a>. 
+                            For other OS builds check <a href="https://github.com/vi/websocat/releases">releases page</a>. SSL support is required.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Connection command with auto-reconnect</th>
+                    <td>
+                        <pre>while :; do <p th:text="${connectionCommand}" th:remove="tag"/> ; echo 'retrying connection'; sleep 5; done</pre> 
+                        <p>stop with CTRL+C</p>
+                    </td>
                 </tr>
             </table>
             <div th:if="${engine.type.name() == 'HYBRID'}">
