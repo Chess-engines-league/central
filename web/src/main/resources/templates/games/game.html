@@ -18,10 +18,12 @@
                 <tr>
                     <th>Game ID</th>
                     <th>Result</th>
+                    <th>Time per move (ms)</th>
                 </tr>
                 <tr>
                     <td th:text="${game.id}" />
                     <td th:text="${game.result}" />
+                    <td th:text="${match.config.timePerMoveMs}" />
                 </tr>
             </table>
 

@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
+import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -14,11 +15,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
+import net.purevirtual.chell.central.web.crud.entity.dto.MatchConfig;
 import net.purevirtual.chell.central.web.crud.entity.enums.MatchState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Entity
 public class Match {
-
+    private static final Logger logger = LoggerFactory.getLogger(Match.class);
+    
     @Id
     @SequenceGenerator(name = "match_id_seq", sequenceName = "match_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "match_id_seq")
@@ -40,6 +45,7 @@ public class Match {
     @Enumerated(EnumType.STRING)
     private MatchState state;
     private String result;
+    private String config;
     private int gameCount;
     private int score1;
     private int score2;
@@ -74,6 +80,17 @@ public class Match {
 
     public void setState(MatchState state) {
         this.state = state;
+    }
+    
+    public MatchConfig getConfig() {
+        if(config==null || config.isBlank()) {
+            return new MatchConfig();
+        }
+        return new Gson().fromJson(config, MatchConfig.class);
+    }
+
+    public void setConfig(MatchConfig config) {
+        this.config = new Gson().toJson(config);
     }
 
     public String getResult() {

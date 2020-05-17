@@ -7,8 +7,13 @@
     <body>
         <div th:replace="layout :: navbar"></div>
         <div class="container bg-secondary">
-            Match: <span th:text="${match.id}" />
-            
+            Match: <span />
+            <table>
+                <tr>
+                    <th>Time per move (ms)</th>
+                    <td th:text="${match.config.timePerMoveMs}" />
+                </tr>
+            </table>
             <p >Status</p>
             <p th:text="${match.result}" />
             <table>

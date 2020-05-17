@@ -46,12 +46,13 @@ public class GamePage extends PageResource {
         }
         
         model.put("game", game);
+        model.put("match", game.getMatch());
         model.put("white", white);
         model.put("black", black);
         List<SingleGameMove> fenList = getFenList(game);
         model.put("fenList", fenList);
         model.put("fenListJson", new Gson().toJson(fenList));
-        return getTemplateEngine().process("games/game", new Context(null, model));
+        return process("games/game", model);
     }
 
     @GET
@@ -59,7 +60,7 @@ public class GamePage extends PageResource {
         HashMap<String,Object> model = new HashMap<>();
         List<Game> games = gameManager.findAll();
         model.put("games", games);
-        return getTemplateEngine().process("games/list", new Context(null, model));
+        return process("games/list", model);
     }
 
     private List<SingleGameMove> getFenList(Game game) {

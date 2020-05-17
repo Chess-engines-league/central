@@ -5,6 +5,7 @@ import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
+import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.junit.After;
@@ -71,8 +72,10 @@ public class GameRunnerTest {
         when(black.reset(any())).thenReturn(mockReset);
         when(white.assignGame(any())).thenReturn(Boolean.TRUE);
         when(black.assignGame(any())).thenReturn(Boolean.TRUE);
-        LiveGame game = new LiveGame(new Game(), white, black, whiteConfig, blackConfig);
-        GameResult result = sut.runSync(game);
+        Game game = new Game();
+        game.setMatch(new Match());
+        LiveGame liveGame = new LiveGame(game, white, black, whiteConfig, blackConfig);
+        GameResult result = sut.runSync(liveGame);
         assertTrue(result.equals(GameResult.BLACK));
     }
     

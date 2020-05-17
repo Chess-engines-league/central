@@ -8,6 +8,7 @@ import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.dto.MatchConfig;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import net.purevirtual.chell.central.web.crud.entity.enums.MatchState;
 
@@ -19,7 +20,7 @@ public class MatchMaker {
     @Inject
     private GameManager matchgameManager;
 
-    public Match newMatch(EngineConfig player1, EngineConfig player2, int gameCount) {
+    public Match newMatch(EngineConfig player1, EngineConfig player2, int gameCount, MatchConfig matchConfig ) {
         Objects.requireNonNull(player1, "player1");
         Objects.requireNonNull(player2, "player2");
         Match match = new Match();
@@ -28,6 +29,7 @@ public class MatchMaker {
         match.setGameCount(gameCount);
         match.setResult("");
         match.setState(MatchState.PENDING);
+        match.setConfig(matchConfig);
         matchManager.save(match);
         for (int gameNumber = 1; gameNumber <= gameCount; gameNumber++) {
             Game game = new Game();

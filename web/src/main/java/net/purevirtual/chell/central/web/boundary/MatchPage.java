@@ -26,6 +26,7 @@ import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.dto.MatchConfig;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.thymeleaf.context.Context;
 
@@ -108,10 +109,13 @@ public class MatchPage extends PageResource {
     public Response newMatchSubmit(
             @FormParam("engineConfig1") int engineConfig1,
             @FormParam("engineConfig2") int engineConfig2,
-            @FormParam("games") int games) throws URISyntaxException {
+            @FormParam("games") int games,
+            @FormParam("timePerMoveMs") long timePerMoveMs) throws URISyntaxException {
         EngineConfig engine1 = engineConfigManager.get(engineConfig1);
         EngineConfig engine2 = engineConfigManager.get(engineConfig2);
-        Match match = matchMaker.newMatch(engine1, engine2, games);
+        MatchConfig matchConfig = new MatchConfig();
+        matchConfig.setTimePerMoveMs(timePerMoveMs);
+        Match match = matchMaker.newMatch(engine1, engine2, games, matchConfig);
         matchRunner.wake();
         // relative to /gui
         return Response.temporaryRedirect(new URI("/matches/" + match.getId())).build();
