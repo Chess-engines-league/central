@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.enums.GamePhase;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 
 

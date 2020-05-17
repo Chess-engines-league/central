@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
+import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,20 +54,21 @@ public class LiveAgentsManager {
     }
     
     public Optional<IAgent> find(Engine engine) {
-        if (engine.getType() == EngineType.HYBRID) {
-            logger.info("Hybrid agent has {} subagents", engine.getSubEngines());
-            List<HybridAgent.HybridSubAgent> subAgents = new ArrayList<>();
-            for (EngineConfig subEngine : engine.getSubEngines()) {
-                logger.info("Checking for {} if subengine is online {}", engine.getId(), subEngine.getEngine().getId());
-                UciAgent subAgent = agentsById.get(subEngine.getEngine().getId());
-                if (subAgent == null) {
-                    return Optional.empty();
-                }
-                subAgents.add(new HybridAgent.HybridSubAgent(subAgent, subEngine));
-            }
-            return Optional.of(new HybridAgent(engine, subAgents));
+        if (engine.getType() != EngineType.HYBRID) {
+            return Optional.ofNullable(agentsById.get(engine.getId()));
         }
-        return Optional.ofNullable(agentsById.get(engine.getId()));
+        logger.info("Hybrid agent has {} subagents", engine.getSubEngines());
+        List<HybridAgent.HybridSubAgent> subAgents = new ArrayList<>();
+        for (SubEnginesRelation subEnginesRelation : engine.getSubEnginesRelations()) {
+            EngineConfig subEngine = subEnginesRelation.getSubEngine();
+            logger.info("Checking for {} if subengine is online {}", engine.getId(), subEngine.getEngine().getId());
+            UciAgent subAgent = agentsById.get(subEngine.getEngine().getId());
+            if (subAgent == null) {
+                return Optional.empty();
+            }
+            subAgents.add(new HybridAgent.HybridSubAgent(subAgent, subEngine, subEnginesRelation.getGamePhase()));
+        }
+        return Optional.of(new HybridAgent(engine, subAgents));
     }
 
     public UciAgent get(String sessionId) {

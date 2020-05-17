@@ -27,6 +27,7 @@ import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
+import net.purevirtual.chell.central.web.crud.entity.enums.GamePhase;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -112,34 +113,49 @@ public class EnginePage extends PageResource {
     @Path("/newHybrid")
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response newHybridEngineSubmit(@FormParam("engineConfigIds") String ids,
+    public Response newHybridEngineSubmit(@FormParam("engineConfigIds") String engineConfigIds,
             @FormParam("name") String name,
-            @FormParam("host") String host
+            @FormParam("host") String host,
+            @FormParam("enginePhases") String enginePhases,
+            @FormParam("moveSelectionType") String moveSelectionType
+            
     ) throws URISyntaxException {
         logger.info("newHybrid name:{}, host: {}, ids:{}",
-                name, host, ids);
+                name, host, engineConfigIds);
         Engine engine = new Engine();
         engine.setName(name);
         engine.setHost(host);
         engine.setType(EngineType.HYBRID);
-        engineManager.save(engine);
-        Stream.of(ids.split(";")).forEachOrdered(engineConfigId-> {
+        engineManager.save(engine); 
+        String[] phases = enginePhases.split(";");
+        String[] ids = engineConfigIds.split(";");
+        for(int i=0;i<ids.length;i++) {
+            String engineConfigId = ids[i];
             logger.info("engineConfigId={}", engineConfigId);
             EngineConfig subEngine = engineConfigManager.get(Integer.parseInt(engineConfigId));
-            engineConfigManager.save(new SubEnginesRelation(engine, subEngine));
-//            subEngine.getHybridEngines().add(engine);
-//            engineConfigManager.update(subEngine);
-        });
-        Stream.of(HybridType.values()).forEachOrdered(type-> {
+            if(moveSelectionType.equals("vote")) {
+                engineConfigManager.save(new SubEnginesRelation(engine, subEngine));
+            } else {
+                engineConfigManager.save(new SubEnginesRelation(engine, subEngine, GamePhase.valueOf(phases[i])));
+            }
+        };
+        if(moveSelectionType.equals("vote")) {
+            Stream.of(HybridType.values()).filter(t -> t != HybridType.PHASE).forEachOrdered(type -> {
+                EngineConfig eg = new EngineConfig();
+                eg.setElo(1200);
+                eg.setEngine(engine);
+                eg.setInitOptions("{\"type\":\"" + type.name() + "\"}");
+                eg.setDescription(type.name().toLowerCase());
+                engineConfigManager.save(eg);
+            });
+        } else {
             EngineConfig eg = new EngineConfig();
             eg.setElo(1200);
             eg.setEngine(engine);
-            eg.setInitOptions("{\"type\":\""+type.name()+"\"}");
-            eg.setDescription(type.name().toLowerCase());
+            eg.setDescription("default");
+            eg.setInitOptions("{\"type\":\"+PHASE+\"}");
             engineConfigManager.save(eg);
-            //engine.getConfigs().add(eg);
-        });
-                
+        }
         // relative to /gui
         return Response.temporaryRedirect(new URI("/engines/" + engine.getId())).build();
     }

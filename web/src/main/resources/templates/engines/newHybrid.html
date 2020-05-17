@@ -9,7 +9,7 @@
         <div class="container bg-secondary">
             <h2>New Hybrid Engine</h2>
             <form action="/gui/engines/newHybrid" method="POST" enctype="application/x-www-form-urlencoded">
-                <p>Subengines:</p>
+                <p></p>
                 <table id="formTable">
                     <tr>
                         <th>
@@ -21,18 +21,42 @@
                     </tr>
                     <tr>
                         <th>
+                            Move selection
+                        </th>
+                        <td colspan="2">
+                            <input type="radio" name="moveSelectionType" value="vote" checked="checked" />Vote<br />
+                            <input type="radio" name="moveSelectionType" value="phase" />Game phase
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
                             Host (optional)
                         </th>
                         <td colspan="2">
                             <input name="host" type="text"/>
                         </td>
                     </tr>
+                    <tr>
+                        <th colspan="3">
+                            Subengines:
+                        </th>
+                    </tr>
                 </table>
                 <button onclick="addEngine();return false" type="button">Add engine</button><br />
                 <input name="engineConfigIds" type="hidden" value=""/>
+                <input name="enginePhases" type="hidden" value=""/>
                 <button onclick="return saveIds();">Create</button>
             </form>
             <script type="text/javascript" >
+                function applyMoveSelectionType() {
+                    let type = document.querySelector('input[name="moveSelectionType"]:checked').value;
+                    if (type==='vote') {
+                        $('select.enginePhase').prop('disabled', 'disabled');
+                    } else {
+                        $('select.enginePhase').prop('disabled', false);
+                    }
+                }
+                
                 function saveIds(event) {
                     var result=[];
                     $(".engineConfig").each(function(index, elem ) {
@@ -40,6 +64,13 @@
                     });
                     console.log(result);
                     $("[name=engineConfigIds]").val(result.join(";"));
+                    
+                    var phases=[];
+                    $(".enginePhase").each(function(index, elem ) {
+                       phases.push($(elem).val());
+                    });
+                    $("[name=enginePhases]").val(phases.join(";"));
+                    
                     if(result.length>=2) {
                         return true;
                     } else {
@@ -59,7 +90,11 @@
                                 });     
                             })
                         }
-                    }).trigger('change');
+                    });
+                    if(!engineConfig.val()) {
+                        // only required if not already loaded
+                        engine.trigger('change');
+                    }
                 };
                 function addEngine() {
                     $.get("/gui/engines/fragment/subEngine", function(responseText) {
@@ -67,12 +102,14 @@
                         var newRow = document.createElement('tr');
                         formTable.appendChild(newRow);
                         newRow.outerHTML = responseText;
+                        applyMoveSelectionType();
                         $.each($('#formTable tr'), function( i, row ) {
                             var engine = $(row).find('.engine');
                             var engineConfig = $(row).find('.engineConfig');
                             if(engine.length===1 && engineConfig.length===1) {
                                 onEngineSelect(engine, engineConfig);
                             }
+                            
                         });
                         
                     });
@@ -80,6 +117,7 @@
 
                 addEngine();
                 addEngine();
+                $('input[name="moveSelectionType"]').on("change", applyMoveSelectionType);
             </script>
         </div>
     </body>

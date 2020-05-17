@@ -9,6 +9,7 @@ import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.enums.GamePhase;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class HybridAgent implements IAgent {
     private EngineConfig engineConfig = null;
     public HybridAgent(Engine engine, List<HybridSubAgent> subagents) {
         if(subagents.isEmpty()) {
-            throw new IllegalArgumentException("Hybrid agent requires subAgents");
+            throw new IllegalArgumentException("Hybrid agent requires subAgents, invalid config for engine "+engine.getId());
         }
         this.engine = engine;
         this.subagents = subagents;
@@ -31,17 +32,23 @@ public class HybridAgent implements IAgent {
     public static class HybridSubAgent {
         public IAgent agent;
         public EngineConfig engineConfig;
+        public GamePhase gamePhase;
 
-        public HybridSubAgent(IAgent agent, EngineConfig engineConfig) {
+        public HybridSubAgent(IAgent agent, EngineConfig engineConfig, GamePhase gamePhase) {
             this.agent = agent;
             this.engineConfig = engineConfig;
+            this.gamePhase = gamePhase;
         }
 
         @Override
         public String toString() {
-            return "HybridSubAgent{" + "agent=" + agent + ", engineConfig=" + engineConfig + '}';
+            return "HybridSubAgent{"
+                    + "agent=" + agent
+                    + ", engineConfig=" + engineConfig
+                    + ", gamePhase=" + gamePhase
+                    + '}';
         }
-        
+      
     }
 
     @Override
@@ -76,7 +83,15 @@ public class HybridAgent implements IAgent {
 
     @Override
     public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit) {
-        //TODO: dodać inne tryby wyboru
+        final HybridType selectType;
+        if (engineConfig != null) {
+            selectType = engineConfig.getHybridConfig().getType();
+        } else {
+            selectType = HybridType.VOTE_ELO;
+        }
+        if (selectType == HybridType.PHASE) {
+            return movePhase(movesSoFar, moveTimeLimit);
+        }
         List<CompletableFuture<BoardMove>> futures = new ArrayList<>();
         for (HybridSubAgent subagent : subagents) {
             futures.add(subagent.agent.move(movesSoFar, moveTimeLimit));
@@ -88,10 +103,7 @@ public class HybridAgent implements IAgent {
                 for (CompletableFuture<BoardMove> future : futures) {
                     moves.add(future.get());
                 }
-                HybridType selectType = HybridType.VOTE_ELO;
-                if(engineConfig != null) {
-                    selectType = engineConfig.getHybridConfig().getType();
-                }
+                
                 BoardMove selectMove = HybridSelect.selectMove(selectType, moves, subagents);
                 logger.info("Selected move {} out of {}", selectMove, moves);
                 return selectMove;
@@ -103,7 +115,38 @@ public class HybridAgent implements IAgent {
             }
         });
     }
+    
+    private CompletableFuture<BoardMove> movePhase(List<String> movesSoFar, long moveTimeLimit) {
+        GamePhase phase;
+        if (movesSoFar.size() < 20) {
+            phase = GamePhase.OPENING;
+        } else if (movesSoFar.size() < 60) {
+            phase = GamePhase.MIDDLEGAME;
+        } else {
+            phase = GamePhase.ENDGAME;
+        }
+        CompletableFuture<BoardMove> move = getByPhase(phase).agent.move(movesSoFar, moveTimeLimit);
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                BoardMove val = move.get();
+                val.appendComment("subengine selected by game phase " + phase);
+                return val;
+            } catch (ExecutionException ex) {
+                throw new RuntimeException(ex);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(ex);
+            }
+        });
+    }
 
+    private HybridSubAgent getByPhase(GamePhase phase) {
+        return subagents.stream().filter(t -> t.gamePhase == phase).
+                findAny()
+                .orElseThrow(() -> new RuntimeException("Missing subEngine for phase" + phase));
+    }
+
+    
     @Override
     public CompletableFuture<Void> reset(EngineConfig engineConfig) {
         this.engineConfig = engineConfig;

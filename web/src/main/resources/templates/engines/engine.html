@@ -27,7 +27,13 @@
                     <th>Token</th>
                     <td th:text="${engine.token}" />
                 </tr>
-                <tr>
+                <tr th:if="${engine.type.name() == 'HYBRID'}">
+                    <th>Connection command</th>
+                    <td>
+                        There is no command for hybrid engine, all sub-engines must be online
+                    </td>
+                </tr>
+                <tr th:if="${engine.type.name() != 'HYBRID'}">
                     <th>Connection command</th>
                     <td>
                         <p th:text="${connectionCommand}" />
@@ -36,7 +42,7 @@
                         </p>
                     </td>
                 </tr>
-                <tr>
+                <tr th:if="${engine.type.name() != 'HYBRID'}">
                     <th>Connection command with auto-reconnect</th>
                     <td>
                         <pre>while :; do <p th:text="${connectionCommand}" th:remove="tag"/> ; echo 'retrying connection'; sleep 5; done</pre> 

@@ -1,16 +1,17 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
 import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import net.purevirtual.chell.central.web.crud.entity.enums.GamePhase;
 
 @Entity
 @Table(name = "subengines")
@@ -22,16 +23,33 @@ public class SubEnginesRelation {
     @Column(updatable = false)
     private Integer id;
     
-    @Column(name = "engine_id")
-    private Integer engineId;
+    @ManyToOne
+    @JoinColumn(name = "engine_id")
+    private Engine engine;
 
-    @Column(name = "subengines_id")
-    private Integer subEngineId;
+    @ManyToOne
+    @JoinColumn(name = "subengines_id")
+    private EngineConfig subEngine;
+    
+    @Enumerated(EnumType.STRING)
+    private GamePhase gamePhase;
+
+    public SubEnginesRelation() {
+    }
+    
+    public SubEnginesRelation(Engine hybridEngine, EngineConfig subEngine, GamePhase gamePhase) {
+        this.engine = hybridEngine;
+        this.subEngine = subEngine;
+        this.gamePhase = gamePhase;
+    }
 
     public SubEnginesRelation(Engine hybridEngine, EngineConfig subEngine) {
-        engineId = hybridEngine.getId();
-        subEngineId = subEngine.getId();
+        this.engine = hybridEngine;
+        this.subEngine = subEngine;
+    }
 
+    public EngineConfig getSubEngine() {
+        return subEngine;
     }
 
     public Integer getId() {
@@ -42,20 +60,27 @@ public class SubEnginesRelation {
         this.id = id;
     }
 
-    public Integer getEngineId() {
-        return engineId;
+//    public Integer getEngineId() {
+//        return engineId;
+//    }
+//
+//    public void setEngineId(Integer engineId) {
+//        this.engineId = engineId;
+//    }
+//
+//    public Integer getSubEngineId() {
+//        return subEngineId;
+//    }
+//
+//    public void setSubEngineId(Integer subEngineId) {
+//        this.subEngineId = subEngineId;
+//    }
+
+    public GamePhase getGamePhase() {
+        return gamePhase;
     }
 
-    public void setEngineId(Integer engineId) {
-        this.engineId = engineId;
+    public void setGamePhase(GamePhase gamePhase) {
+        this.gamePhase = gamePhase;
     }
-
-    public Integer getSubEngineId() {
-        return subEngineId;
-    }
-
-    public void setSubEngineId(Integer subEngineId) {
-        this.subEngineId = subEngineId;
-    }
-
 }

@@ -17,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.SequenceGenerator;
@@ -46,6 +47,9 @@ public class Engine {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "subengines")
     private Set<EngineConfig> subEngines;
+    
+    @OneToMany(mappedBy = "engine", fetch = FetchType.EAGER)
+    private Set<SubEnginesRelation> subEnginesRelations;
 
     public Integer getId() {
         return id;
@@ -86,6 +90,10 @@ public class Engine {
         ArrayList<EngineConfig> tmp = new ArrayList<>(subEngines);
         Collections.sort(tmp, (a, b) -> a.getId().compareTo(b.getId()));
         return tmp;
+    }
+
+    public Set<SubEnginesRelation> getSubEnginesRelations() {
+        return subEnginesRelations;
     }
 
     public Set<EngineConfig> getConfigs() {
