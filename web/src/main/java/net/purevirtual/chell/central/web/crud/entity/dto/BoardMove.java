@@ -41,6 +41,14 @@ public class BoardMove implements Serializable {
             this.comment = this.comment + "; " + comment;
         }
     }
-    
+
+    @Override
+    public String toString() {
+        return "BoardMove{"
+                + "move=" + move
+                + ", ponder=" + ponder
+                + ", comment=" + comment
+                + '}';
+    }
     
 }

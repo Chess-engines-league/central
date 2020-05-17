@@ -118,6 +118,7 @@ public class HybridAgent implements IAgent {
     
     private CompletableFuture<BoardMove> movePhase(List<String> movesSoFar, long moveTimeLimit) {
         GamePhase phase;
+        //TODO: proper endgame estimate like in https://www.chessstrategyonline.com/content/tutorials/basic-chess-concepts-phases-of-the-game
         if (movesSoFar.size() < 20) {
             phase = GamePhase.OPENING;
         } else if (movesSoFar.size() < 60) {
@@ -125,6 +126,7 @@ public class HybridAgent implements IAgent {
         } else {
             phase = GamePhase.ENDGAME;
         }
+        logger.info("selected phase = {}, moves so far",phase,movesSoFar);
         CompletableFuture<BoardMove> move = getByPhase(phase).agent.move(movesSoFar, moveTimeLimit);
         return CompletableFuture.supplyAsync(() -> {
             try {
@@ -141,8 +143,8 @@ public class HybridAgent implements IAgent {
     }
 
     private HybridSubAgent getByPhase(GamePhase phase) {
-        return subagents.stream().filter(t -> t.gamePhase == phase).
-                findAny()
+        return subagents.stream().filter(t -> t.gamePhase == phase)
+                .findAny()
                 .orElseThrow(() -> new RuntimeException("Missing subEngine for phase" + phase));
     }
 

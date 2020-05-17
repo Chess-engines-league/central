@@ -3,6 +3,7 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -122,8 +123,15 @@ public class UciAgent implements IAgent {
     @Override
     public synchronized boolean assignGame(LiveGame game) throws InterruptedException {
         if (this.liveGame != null) {
-            logger.info("agent {}: rejecting {}, already busy with game {}", this.agentEntity.getId(), game.getGame().getId(), this.liveGame.getGame().getId());
-            return false;
+            if(Objects.equals(this.liveGame.getGame().getId(), game.getGame().getId())) {
+                // TODO: we should not allow this to happen if two sepparate configs are used for same agent
+                // switching config between moves is either unsupported or slow.
+                logger.info("agent {}: joining again game {}", this.agentEntity.getId(), game.getGame().getId());
+                return true;
+            } else {
+                logger.info("agent {}: rejecting {}, already busy with game {}", this.agentEntity.getId(), game.getGame().getId(), this.liveGame.getGame().getId());
+                return false;
+            }
         }
         logger.info("agent {}: joining game {}", this.agentEntity.getId(), game.getGame().getId());
         this.liveGame = game;
