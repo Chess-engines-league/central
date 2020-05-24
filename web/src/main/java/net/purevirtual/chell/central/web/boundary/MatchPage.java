@@ -110,11 +110,14 @@ public class MatchPage extends PageResource {
             @FormParam("engineConfig1") int engineConfig1,
             @FormParam("engineConfig2") int engineConfig2,
             @FormParam("games") int games,
-            @FormParam("timePerMoveMs") long timePerMoveMs) throws URISyntaxException {
+            @FormParam("timePerMoveMs") long timePerMoveMs,
+            @FormParam("timePerGameS") long timePerGameS
+            ) throws URISyntaxException {
         EngineConfig engine1 = engineConfigManager.get(engineConfig1);
         EngineConfig engine2 = engineConfigManager.get(engineConfig2);
         MatchConfig matchConfig = new MatchConfig();
         matchConfig.setTimePerMoveMs(timePerMoveMs);
+        matchConfig.setTimePerGameS(timePerGameS);
         Match match = matchMaker.newMatch(engine1, engine2, games, matchConfig);
         matchRunner.wake();
         // relative to /gui

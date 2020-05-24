@@ -30,7 +30,6 @@ public class LiveGame {
         this.game = game;
         this.blackConfig = blackConfig;
         this.whiteConfig = whiteConfig;
-        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
     }
 
     public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig) {
@@ -70,12 +69,12 @@ public class LiveGame {
     }
 
     public Duration getWhiteClockLeft() {
-        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
+        long timePerGameMs = game.getMatch().getConfig().getTimePerGameS()*1000;
         return Duration.ofMillis(timePerGameMs - game.getClockWhite());
     }
 
     public Duration getBlackClockLeft() {
-        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
+        long timePerGameMs = game.getMatch().getConfig().getTimePerGameS()*1000;
         return Duration.ofMillis(timePerGameMs - game.getClockBlack());
     }
 

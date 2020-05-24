@@ -47,7 +47,9 @@ public class UciAgent implements IAgent {
         } else {
             remote.send("position startpos moves " + String.join(" ", movesSoFar));
         }
-        remote.send("go wtime " + whiteClockLeft.toMillis() + " btime " + blackClockLeft + " movetime " + moveTimeLimit);
+        long wtime = whiteClockLeft.toMillis();
+        long btime = blackClockLeft.toMillis();
+        remote.send("go wtime " + wtime + " btime " + btime + " movetime " + moveTimeLimit);
         return moveFutures.addNew();
     }
 

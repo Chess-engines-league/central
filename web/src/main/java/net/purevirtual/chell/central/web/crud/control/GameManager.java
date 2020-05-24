@@ -45,13 +45,14 @@ public class GameManager {
         } else {
             p2Inc = moveDuration.toMillisPart();
         }
+        game.setClock1ms(game.getClock1ms() + p1Inc);
+        game.setClock2ms(game.getClock2ms() + p2Inc);
         entityManager.createQuery("update Game g set g.boardState = :boardState, g.clock1ms = g.clock1ms + :p1Inc, g.clock2ms=g.clock2ms+:p2Inc where g.id = :id")
                 .setParameter("id", game.getId())
                 .setParameter("boardState", json)
                 .setParameter("p1Inc", p1Inc)
                 .setParameter("p2Inc", p2Inc)
                 .executeUpdate();
-        entityManager.refresh(game);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
