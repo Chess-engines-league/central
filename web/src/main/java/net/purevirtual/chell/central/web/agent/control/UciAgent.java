@@ -123,7 +123,8 @@ public class UciAgent implements IAgent {
     @Override
     public synchronized boolean assignGame(LiveGame game) throws InterruptedException {
         if (this.liveGame != null) {
-            if(Objects.equals(this.liveGame.getGame().getId(), game.getGame().getId())) {
+            // this is an identity check by purpose
+            if (this.liveGame == game) {
                 // TODO: we should not allow this to happen if two sepparate configs are used for same agent
                 // switching config between moves is either unsupported or slow.
                 logger.info("agent {}: joining again game {}", this.agentEntity.getId(), game.getGame().getId());
