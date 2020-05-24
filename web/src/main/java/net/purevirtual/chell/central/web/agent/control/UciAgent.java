@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -39,14 +40,14 @@ public class UciAgent implements IAgent {
     }
     
     @Override
-    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit) {
+    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit, Duration whiteClockLeft, Duration blackClockLeft) {
         state = State.WAIT_FOR_MOVE;
         if (movesSoFar.isEmpty()) {
             remote.send("position startpos");
         } else {
             remote.send("position startpos moves " + String.join(" ", movesSoFar));
         }
-        remote.send("go movetime "+moveTimeLimit);
+        remote.send("go wtime " + whiteClockLeft.toMillis() + " btime " + blackClockLeft + " movetime " + moveTimeLimit);
         return moveFutures.addNew();
     }
 

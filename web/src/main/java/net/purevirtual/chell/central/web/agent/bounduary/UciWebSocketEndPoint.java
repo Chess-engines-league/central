@@ -51,8 +51,8 @@ public class UciWebSocketEndPoint {
     @OnMessage
     public void onMessage(Session session, String message) {
         String trimmedMessage = message.trim();
-        //logger.debug("Got message: '{}', handing to agent {}", trimmedMessage, session.getId());
-        logger.info("Got message: '{}', handing to agent {}", trimmedMessage, session.getId());
+        logger.debug("Got message: '{}', handing to agent {}", trimmedMessage, session.getId());
+        //logger.info("Got message: '{}', handing to agent {}", trimmedMessage, session.getId());
         uciAgent.onMessage(trimmedMessage);
     }
 

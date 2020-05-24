@@ -1,9 +1,9 @@
 package net.purevirtual.chell.central.web.agent.entity;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.purevirtual.chell.central.web.agent.control.IAgent;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
@@ -30,6 +30,7 @@ public class LiveGame {
         this.game = game;
         this.blackConfig = blackConfig;
         this.whiteConfig = whiteConfig;
+        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
     }
 
     public LiveGame(Game game, IAgent white, IAgent black, EngineConfig whiteConfig, EngineConfig blackConfig) {
@@ -66,6 +67,16 @@ public class LiveGame {
 
     public EngineConfig getBlackConfig() {
         return blackConfig;
+    }
+
+    public Duration getWhiteClockLeft() {
+        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
+        return Duration.ofMillis(timePerGameMs - game.getClockWhite());
+    }
+
+    public Duration getBlackClockLeft() {
+        long timePerGameMs = game.getMatch().getConfig().getTimePerGameMs();
+        return Duration.ofMillis(timePerGameMs - game.getClockBlack());
     }
 
 }

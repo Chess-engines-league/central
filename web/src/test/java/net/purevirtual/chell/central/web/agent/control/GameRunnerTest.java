@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
@@ -67,8 +68,8 @@ public class GameRunnerTest {
         CompletableFuture<BoardMove> move4 = mockMove("d8h4");
         CompletableFuture<Void> mockReset = mockReset();
         
-        when(white.move(any(), anyLong())).thenReturn(move1, move3);
-        when(black.move(any(), anyLong())).thenReturn(move2, move4);
+        when(white.move(any(), anyLong(), any(), any())).thenReturn(move1, move3);
+        when(black.move(any(), anyLong(), any(), any())).thenReturn(move2, move4);
         when(white.reset(any())).thenReturn(mockReset);
         when(black.reset(any())).thenReturn(mockReset);
         when(white.assignGame(any())).thenReturn(Boolean.TRUE);

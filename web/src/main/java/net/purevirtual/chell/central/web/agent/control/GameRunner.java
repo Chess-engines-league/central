@@ -116,7 +116,8 @@ public class GameRunner {
     
     private Optional<ResultAndReason> halfMove(LiveGame game, IAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
         logger.info("{} start a move", side);
-        Future<BoardMove> moveFuture = agent.move(game.getRawMoves(), moveLimit);
+
+        Future<BoardMove> moveFuture = agent.move(game.getRawMoves(), moveLimit, game.getWhiteClockLeft(), game.getBlackClockLeft());
         Instant moveStart = Instant.now();
         BoardMove move;
         try {

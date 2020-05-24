@@ -51,6 +51,7 @@ public class GameManager {
                 .setParameter("p1Inc", p1Inc)
                 .setParameter("p2Inc", p2Inc)
                 .executeUpdate();
+        entityManager.refresh(game);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)

@@ -79,6 +79,22 @@ public class Game {
     public int getClock1ms() {
         return clock1ms;
     }
+    
+    public int getClockWhite() {
+        if(whitePlayedByFirstAgent) {
+            return clock1ms;
+        } else {
+            return clock2ms;
+        }
+    }
+    
+    public int getClockBlack() {
+        if(whitePlayedByFirstAgent) {
+            return clock2ms;
+        } else {
+            return clock1ms;
+        }
+    }
 
     public void setClock1ms(int clock1ms) {
         this.clock1ms = clock1ms;

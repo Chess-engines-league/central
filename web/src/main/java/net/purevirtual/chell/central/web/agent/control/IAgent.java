@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -11,7 +12,6 @@ public interface IAgent {
     /**
      *
      * @param game game to join
-     * @param reentrant - is joining the same game again allowed
      * @return true if agent joined the game
      * @throws InterruptedException
      */
@@ -19,7 +19,7 @@ public interface IAgent {
     Optional<LiveGame> getLiveGame();
     void release(LiveGame game);
     
-    CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit);
+    CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit, Duration whiteClockLeft, Duration blackClockLeft);
     CompletableFuture<Void> reset(EngineConfig engineConfig);
     
     int getId(); 
