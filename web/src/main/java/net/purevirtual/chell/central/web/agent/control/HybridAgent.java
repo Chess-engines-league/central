@@ -1,5 +1,10 @@
 package net.purevirtual.chell.central.web.agent.control;
 
+import com.github.bhlangonijr.chesslib.Board;
+import com.github.bhlangonijr.chesslib.Piece;
+import com.github.bhlangonijr.chesslib.move.MoveConversionException;
+import com.github.bhlangonijr.chesslib.move.MoveList;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +87,7 @@ public class HybridAgent implements IAgent {
     }
 
     @Override
-    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit) {
+    public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit, Duration whiteClockLeft, Duration blackClockLeft) {
         final HybridType selectType;
         if (engineConfig != null) {
             selectType = engineConfig.getHybridConfig().getType();
@@ -90,11 +95,11 @@ public class HybridAgent implements IAgent {
             selectType = HybridType.VOTE_ELO;
         }
         if (selectType == HybridType.PHASE) {
-            return movePhase(movesSoFar, moveTimeLimit);
+            return movePhase(movesSoFar, moveTimeLimit, whiteClockLeft, blackClockLeft);
         }
         List<CompletableFuture<BoardMove>> futures = new ArrayList<>();
         for (HybridSubAgent subagent : subagents) {
-            futures.add(subagent.agent.move(movesSoFar, moveTimeLimit));
+            futures.add(subagent.agent.move(movesSoFar, moveTimeLimit, whiteClockLeft, blackClockLeft));
         }
         return CompletableFuture.supplyAsync(()-> {
             CompletableFuture.allOf(toArray(futures));
@@ -116,18 +121,35 @@ public class HybridAgent implements IAgent {
         });
     }
     
-    private CompletableFuture<BoardMove> movePhase(List<String> movesSoFar, long moveTimeLimit) {
+    private CompletableFuture<BoardMove> movePhase(List<String> movesSoFar, long moveTimeLimit, Duration whiteClockLeft, Duration blackClockLeft) {
         GamePhase phase;
-        //TODO: proper endgame estimate like in https://www.chessstrategyonline.com/content/tutorials/basic-chess-concepts-phases-of-the-game
         if (movesSoFar.size() < 20) {
             phase = GamePhase.OPENING;
-        } else if (movesSoFar.size() < 60) {
-            phase = GamePhase.MIDDLEGAME;
         } else {
-            phase = GamePhase.ENDGAME;
+            //endgame estimate like in https://www.chessstrategyonline.com/content/tutorials/basic-chess-concepts-phases-of-the-game
+            Board board = new Board();
+            if (!movesSoFar.isEmpty()) {
+
+                MoveList list = new MoveList();
+                try {
+                    list.loadFromText(String.join(" ", movesSoFar));
+                } catch (MoveConversionException ex) {
+                    throw new RuntimeException(ex);
+                }
+                String fen = list.getFen();
+                board.loadFromFen(fen);
+            }
+            long figCountWhite = countPieces(board, Piece.WHITE_BISHOP, Piece.WHITE_KNIGHT, Piece.WHITE_ROOK, Piece.WHITE_QUEEN);
+            long figCountBlack = countPieces(board, Piece.BLACK_BISHOP, Piece.BLACK_KNIGHT, Piece.BLACK_ROOK, Piece.BLACK_QUEEN);
+            if (figCountBlack <= 2 || figCountWhite <= 2) {
+                phase = GamePhase.ENDGAME;
+            } else {
+                phase = GamePhase.MIDDLEGAME;
+            }
+            logger.info("selecting {}, figureCountWhite={}, figureCountBlack={}", phase, figCountWhite, figCountBlack);
         }
         logger.info("selected phase = {}, moves so far",phase,movesSoFar);
-        CompletableFuture<BoardMove> move = getByPhase(phase).agent.move(movesSoFar, moveTimeLimit);
+        CompletableFuture<BoardMove> move = getByPhase(phase).agent.move(movesSoFar, moveTimeLimit, whiteClockLeft, blackClockLeft);
         return CompletableFuture.supplyAsync(() -> {
             try {
                 BoardMove val = move.get();
@@ -140,6 +162,15 @@ public class HybridAgent implements IAgent {
                 throw new RuntimeException(ex);
             }
         });
+    }
+    
+    private long countPieces(Board board, Piece... pieces) {
+        int count = 0;
+
+        for (Piece piece : pieces) {
+            count += Long.bitCount(board.getBitboard(piece));
+        }
+        return count;
     }
 
     private HybridSubAgent getByPhase(GamePhase phase) {
