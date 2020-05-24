@@ -21,6 +21,7 @@ public class WsAgentInput implements AgentInput {
         for (String message : messages) {
             // we don't really care about result - if engine doesn't reply fast
             // enough or connections is dropped it will be killed and removed anyway
+            logger.info("sending to agent : '{}'", message);
             remote.sendText(message);
         }
     }

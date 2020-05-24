@@ -1,5 +1,6 @@
 package net.purevirtual.chell.central.web.crud.control;
 
+import java.time.Duration;
 import java.util.List;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
@@ -10,7 +11,9 @@ import javax.persistence.PersistenceContext;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
-import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
+import net.purevirtual.chell.central.web.crud.entity.dto.ResultAndReason;
+import net.purevirtual.chell.central.web.crud.entity.enums.Player;
+import net.purevirtual.chell.central.web.crud.entity.enums.Side;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,19 +36,29 @@ public class GameManager {
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     @Asynchronous
-    public void updateBoardState(Game game, BoardState moves) {
+    public void updateBoardState(Game game, BoardState moves, Duration moveDuration, Side side) {
         String json = moves.toJson();
-        entityManager.createQuery("update Game g set g.boardState = :boardState where g.id = :id")
+        int p1Inc = 0;
+        int p2Inc = 0;
+        if(game.getPlayer(side)==Player.PLAYER1) {
+            p1Inc = moveDuration.toMillisPart();
+        } else {
+            p2Inc = moveDuration.toMillisPart();
+        }
+        entityManager.createQuery("update Game g set g.boardState = :boardState, g.clock1ms = g.clock1ms + :p1Inc, g.clock2ms=g.clock2ms+:p2Inc where g.id = :id")
                 .setParameter("id", game.getId())
                 .setParameter("boardState", json)
+                .setParameter("p1Inc", p1Inc)
+                .setParameter("p2Inc", p2Inc)
                 .executeUpdate();
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void updateGameResult(Game game, GameResult gameResult) {
-        entityManager.createQuery("update Game g set g.result = :result where g.id = :id")
+    public void updateGameResult(Game game, ResultAndReason resultAndReason) {
+        entityManager.createQuery("update Game g set g.result = :result, g.reason=:reason where g.id = :id")
                 .setParameter("id", game.getId())
-                .setParameter("result", gameResult)
+                .setParameter("result", resultAndReason.getResult())
+                .setParameter("reason", resultAndReason.getReason())
                 .executeUpdate();    
     }
 

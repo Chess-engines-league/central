@@ -1,13 +1,8 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,6 +15,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
+import net.purevirtual.chell.central.web.crud.entity.enums.GameResultReason;
+import net.purevirtual.chell.central.web.crud.entity.enums.Player;
+import net.purevirtual.chell.central.web.crud.entity.enums.Side;
 
 @Entity
 public class Game {   
@@ -40,6 +38,20 @@ public class Game {
     private String boardState;
     @Enumerated(EnumType.STRING)
     private GameResult result;
+    @Enumerated(EnumType.STRING)
+    private GameResultReason reason;
+    private int clock1ms = 0;
+    private int clock2ms = 0;
+    
+    public Player getPlayer(Side side) {
+        if (side == Side.WHITE && whitePlayedByFirstAgent) {
+            return Player.PLAYER1;
+        }
+        if (side == Side.BLACK && !whitePlayedByFirstAgent) {
+            return Player.PLAYER1;
+        }
+        return Player.PLAYER2;
+    }
     
     public List<String> getMoves() {
         if (boardState == null || boardState.isBlank()) {
@@ -62,6 +74,22 @@ public class Game {
 
     public void setMatch(Match match) {
         this.match = match;
+    }
+
+    public int getClock1ms() {
+        return clock1ms;
+    }
+
+    public void setClock1ms(int clock1ms) {
+        this.clock1ms = clock1ms;
+    }
+
+    public int getClock2ms() {
+        return clock2ms;
+    }
+
+    public void setClock2ms(int clock2ms) {
+        this.clock2ms = clock2ms;
     }
 
     public boolean isWhitePlayedByFirstAgent() {
@@ -99,7 +127,14 @@ public class Game {
     public void setResult(GameResult result) {
         this.result = result;
     }
-    
+
+    public GameResultReason getReason() {
+        return reason;
+    }
+
+    public void setReason(GameResultReason reason) {
+        this.reason = reason;
+    }    
     
     public int getPlayer1Score() {
         if (result == GameResult.WHITE) {

@@ -45,12 +45,14 @@
                 <tr>
                     <th>ID</th>
                     <th>Result</th>
+                    <th>Reason</th>
                     <td>Player 1</td>
                     <td>Player 2</td>
                 </tr>
                 <tr th:each="game:${games}">
                     <td><a th:href="${'/gui/games/' + game.game.id}"th:text="${game.game.id}"/></td>
                     <td><a th:href="${'/gui/games/' + game.game.id}" th:text="${game.game.result}"/></td>
+                    <td th:text="${game.game.reason}" />
                     <td th:text="${game.score1}" />
                     <td th:text="${game.score2}" />
                 </tr>

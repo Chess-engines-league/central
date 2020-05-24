@@ -37,18 +37,26 @@ public class GamePage extends PageResource {
         Game game = gameManager.get(gameId);
         HashMap<String,Object> model = new HashMap<>();
         EngineConfig white,black;
+        int whiteTimer;
+        int blackTimer;
         if (game.isWhitePlayedByFirstAgent()) {
             white = game.getMatch().getPlayer1();
             black = game.getMatch().getPlayer2();
+            whiteTimer = game.getClock1ms();
+            blackTimer = game.getClock2ms();
         } else {
             white = game.getMatch().getPlayer2();
             black = game.getMatch().getPlayer1();
+            whiteTimer = game.getClock2ms();
+            blackTimer = game.getClock1ms();
         }
         
         model.put("game", game);
         model.put("match", game.getMatch());
         model.put("white", white);
         model.put("black", black);
+        model.put("whiteTimer", whiteTimer);
+        model.put("blackTimer", blackTimer);
         List<SingleGameMove> fenList = getFenList(game);
         model.put("fenList", fenList);
         model.put("fenListJson", new Gson().toJson(fenList));

@@ -7,6 +7,7 @@ import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.dto.ResultAndReason;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
@@ -75,8 +76,8 @@ public class GameRunnerTest {
         Game game = new Game();
         game.setMatch(new Match());
         LiveGame liveGame = new LiveGame(game, white, black, whiteConfig, blackConfig);
-        GameResult result = sut.runSync(liveGame);
-        assertTrue(result.equals(GameResult.BLACK));
+        ResultAndReason result = sut.runSync(liveGame);
+        assertTrue(result.getResult() == GameResult.BLACK);
     }
     
     private static CompletableFuture<BoardMove> mockMove(String input) throws Exception {

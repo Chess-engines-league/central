@@ -21,7 +21,10 @@ import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardState;
+import net.purevirtual.chell.central.web.crud.entity.dto.ResultAndReason;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
+import net.purevirtual.chell.central.web.crud.entity.enums.GameResultReason;
+import net.purevirtual.chell.central.web.crud.entity.enums.Side;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +42,7 @@ public class GameRunner {
         runSync(game);
     }
     
-    public GameResult runSync(LiveGame game) {
+    public ResultAndReason runSync(LiveGame game) {
         IAgent white = game.getWhite();
         IAgent black = game.getBlack();
         logger.info("running {} between {} and {}", game, white.getId(), black.getId());
@@ -49,29 +52,29 @@ public class GameRunner {
                 logger.info("Cannot start game {} from match {}, the agent {} is busy",
                         game.getGame().getId(), game.getGame().getMatch().getId(), game.getWhite().getId()
                 );
-                return GameResult.PENDING;
+                return ResultAndReason.pending();
             }
             if (!black.assignGame(game)) {
                 logger.info("Cannot start game {} from match {}, the agent {} is busy",
                         game.getGame().getId(), game.getGame().getMatch().getId(), game.getBlack().getId()
                 );
-                return GameResult.PENDING;
+                return ResultAndReason.pending();
             }
-            GameResult result = runInternal(game);
+            ResultAndReason result = runInternal(game);
             logger.info("game done, result {}", result);
             gameManager.updateGameResult(game.getGame(), result);
             return result;
         } catch (InterruptedException ex) {
             logger.error("Game execution was interrupted", ex);
             Thread.currentThread().interrupt();
-            return GameResult.PENDING;
+            return ResultAndReason.pending();
         } finally {
             white.release(game);
             black.release(game);
         }
     }
 
-    private GameResult runInternal(LiveGame game) throws InterruptedException {
+    private ResultAndReason runInternal(LiveGame game) throws InterruptedException {
         try {
             logger.info("reseting agents");
             long timePerMoveMs = game.getGame().getMatch().getConfig().getTimePerMoveMs();
@@ -91,12 +94,12 @@ public class GameRunner {
             for (int i = 1; i <= 2000; i++) {
                 if (game.getMoves().size() % 2 == 0) {
                     // if the number of half moves is even, then WHITE should move
-                    Optional<GameResult> result = halfMove(game, game.getWhite(), timePerMoveMs, Side.WHITE);
+                    Optional<ResultAndReason> result = halfMove(game, game.getWhite(), timePerMoveMs, Side.WHITE);
                     if (result.isPresent()) {
                         return result.get();
                     }
                 } else {
-                    Optional<GameResult> result = halfMove(game, game.getBlack(), timePerMoveMs, Side.BLACK);
+                    Optional<ResultAndReason> result = halfMove(game, game.getBlack(), timePerMoveMs, Side.BLACK);
                     if (result.isPresent()) {
                         return result.get();
                     }
@@ -105,38 +108,38 @@ public class GameRunner {
 
         } catch (ExecutionException | MoveConversionException |MoveGeneratorException ex) {
             logger.error("Game failed to complete", ex);
-            return GameResult.ERROR;
+            return ResultAndReason.error();
         }
         logger.error("Game failed to complete - move limit reached");
-        return GameResult.ERROR;
+        return ResultAndReason.error();
     }
     
-    private Optional<GameResult> halfMove(LiveGame game, IAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
+    private Optional<ResultAndReason> halfMove(LiveGame game, IAgent agent, long moveLimit, Side side) throws InterruptedException, MoveConversionException, MoveGeneratorException {
         logger.info("{} start a move", side);
         Future<BoardMove> moveFuture = agent.move(game.getRawMoves(), moveLimit);
         Instant moveStart = Instant.now();
         BoardMove move;
         try {
             move = moveFuture.get(2 * moveLimit, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException|ExecutionException ex) {
+        } catch (TimeoutException | ExecutionException ex) {
             logger.info("{} failed to return move in allowed time", side);
-            return Optional.of(side.opponent().result());
+            return Optional.of(new ResultAndReason(side.opponent().result(), GameResultReason.MOVE_TIME_LIMIT));
         }
         Duration moveDuration = Duration.between(moveStart, Instant.now());
         move.appendComment(String.format("received move in %d ms, limit: %d", moveDuration.toMillis(), moveLimit));
         if (!isLegal(game.getMovesString(), move.getMove())) {
             logger.info("{} illegal move:  {}", side, move);
-            return Optional.of(side.opponent().result());
+            return Optional.of(new ResultAndReason(side.opponent().result(), GameResultReason.ILLEGAL_MOVE));
         }
         game.getMoves().add(move);
         final BoardState boardState = new BoardState();
         boardState.setBoardMoves(game.getMoves());
-        gameManager.updateBoardState(game.getGame(), boardState);
+        gameManager.updateBoardState(game.getGame(), boardState, moveDuration, side);
         logger.info("all moves after {} move: {}", side, game.getRawMoves());
         return isDone(game.getMovesString(), side);
     }
 
-    private Optional<GameResult> isDone(String len, Side side) throws MoveConversionException {
+    private Optional<ResultAndReason> isDone(String len, Side side) throws MoveConversionException {
         MoveList list = new MoveList();
         list.loadFromText(len);
         String fen = list.getFen();
@@ -147,12 +150,18 @@ public class GameRunner {
         logger.info("state\n{}", board);
         logger.info("draw={}, InsufficientMaterial={}, KingAttacked={}, mated={}, stalemate={}",
                 board.isDraw(), board.isInsufficientMaterial(), board.isKingAttacked(), board.isMated(), board.isStaleMate());
-        if (board.isDraw() || board.isStaleMate()) {
-            return Optional.of(GameResult.DRAW);
+        if (board.isInsufficientMaterial()) {
+            return Optional.of(new ResultAndReason(GameResult.DRAW, GameResultReason.INSUFFICIENT_MATERIAL));
+        }
+        if (board.isDraw()) {
+            return Optional.of(new ResultAndReason(GameResult.DRAW, GameResultReason.DRAW));
+        }
+        if (board.isStaleMate()) {
+            return Optional.of(new ResultAndReason(GameResult.DRAW, GameResultReason.STALEMATE));
         }
         if (board.isMated()) {
             logger.info("returning {}", side);
-            return Optional.of(side.result());
+            return Optional.of(new ResultAndReason(side.result(), GameResultReason.MAT));
         }
         return Optional.empty();
     }
@@ -171,23 +180,5 @@ public class GameRunner {
                 .anyMatch(legal -> move.equals(legal.toString()));
     }
     
-    enum Side {
-        WHITE,
-        BLACK;
-
-        public Side opponent() {
-            if (this == WHITE) {
-                return BLACK;
-            }
-            return WHITE;
-        }
-        
-        public GameResult result() {
-            if (this == WHITE) {
-                return GameResult.WHITE;
-            }
-            return GameResult.BLACK;
-        }
-    }
 
 }

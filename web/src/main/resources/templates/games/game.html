@@ -18,11 +18,13 @@
                 <tr>
                     <th>Game ID</th>
                     <th>Result</th>
+                    <th>Reason</th>
                     <th>Time per move (ms)</th>
                 </tr>
                 <tr>
                     <td th:text="${game.id}" />
                     <td th:text="${game.result}" />
+                    <td th:text="${game.reason}" />
                     <td th:text="${match.config.timePerMoveMs}" />
                 </tr>
             </table>
@@ -36,18 +38,21 @@
                     <th>id</th>
                     <th>description</th>
                     <th>configuration</th>
+                    <th>total used time(ms)</th>
                 </tr>
                 <tr>
                     <td>White</td>
                     <td th:text="${white.id}"/>
                     <td th:text="${white.engine.name}"/>
                     <td th:text="${white.description}" />    
+                    <td th:text="${whiteTimer}" />   
                 </tr>
                 <tr>
                     <td>Black</td>
                     <td th:text="${black.id}"/>
                     <td th:text="${black.engine.name}"/>
                     <td th:text="${black.description}" />    
+                    <td th:text="${blackTimer}" />   
                 </tr>
             </table>
             <div class="row">
