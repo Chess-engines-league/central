@@ -3,8 +3,8 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -14,6 +14,7 @@ import net.purevirtual.chell.central.web.agent.entity.LiveGame;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.dto.BoardMove;
+import net.purevirtual.chell.central.web.crud.entity.dto.UciEngineOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,9 @@ public class UciAgent implements IAgent {
     private LiveGame liveGame;
     private final CompletableFutures<Void> readyFutures = new CompletableFutures();
     private final CompletableFutures<BoardMove> moveFutures = new CompletableFutures<>();
+    private final List<String> afterPonderCommands = new ArrayList<>();
     private LocalDateTime lastMessage = null;
+    private boolean ponder = false;
     public UciAgent(AgentInput remote, Engine agentEntity) {
         this.remote = remote;
         this.agentEntity = agentEntity;
@@ -41,15 +44,23 @@ public class UciAgent implements IAgent {
     
     @Override
     public CompletableFuture<BoardMove> move(List<String> movesSoFar, long moveTimeLimit, Duration whiteClockLeft, Duration blackClockLeft) {
-        state = State.WAIT_FOR_MOVE;
+        List<String> moveCommands = new ArrayList<>();
         if (movesSoFar.isEmpty()) {
-            remote.send("position startpos");
+            moveCommands.add("position startpos");
         } else {
-            remote.send("position startpos moves " + String.join(" ", movesSoFar));
+            moveCommands.add("position startpos moves " + String.join(" ", movesSoFar));
         }
         long wtime = whiteClockLeft.toMillis();
         long btime = blackClockLeft.toMillis();
-        remote.send("go wtime " + wtime + " btime " + btime + " movetime " + moveTimeLimit);
+        moveCommands.add("go wtime " + wtime + " btime " + btime + " movetime " + moveTimeLimit);
+        if (state == State.PONDERING) {
+            remote.send("stop");
+            afterPonderCommands.clear();
+            afterPonderCommands.addAll(moveCommands);
+        } else {
+            state = State.WAIT_FOR_MOVE;
+            remote.send(moveCommands);
+        }
         return moveFutures.addNew();
     }
 
@@ -62,6 +73,14 @@ public class UciAgent implements IAgent {
         String cmd = parts[0];
         switch (cmd) {
             case "bestmove":
+                if(state==State.PONDERING) {
+                    logger.info("Received {}, as result of ponder", message);
+                    // ignoring
+                    state = State.WAIT_FOR_MOVE;
+                    remote.send(afterPonderCommands); 
+                    afterPonderCommands.clear();
+                    return;
+                }
                 String move = parts[1];
                 BoardMove boardMove = new BoardMove();
                 boardMove.setMove(move);
@@ -71,8 +90,10 @@ public class UciAgent implements IAgent {
                     String comment = Stream.of(parts).skip(2).collect(Collectors.joining(" "));
                     boardMove.setComment(comment);
                 }
-                // TODO: make this configurable
-                //remote.send("go ponder");
+                if (ponder) {
+                    remote.send("go ponder");
+                    state = State.PONDERING;
+                }
                 moveFutures.complete(boardMove);
                 break;
             case "info":
@@ -81,7 +102,7 @@ public class UciAgent implements IAgent {
             case "uciok":
                 //sendOptions(engineConfig);
                 state = State.WAIT_FOR_READY_OK;
-                remote.send("ucinewgame", "isready");
+                remote.send("stop", "ucinewgame", "isready");
                 break;
             case "readyok":
                 readyFutures.complete(null);
@@ -107,16 +128,13 @@ public class UciAgent implements IAgent {
     }
     
     private void sendOptions(EngineConfig engineConfig) {
-        String initOptions = engineConfig.getInitOptions();
-        if (initOptions != null) {
-            logger.info("initing the game engine with options: {}", initOptions);
-            for (String option : initOptions.split("\\R")) {
-                String trimmed = option.trim();
-                if (!trimmed.isEmpty()) {
-                    remote.send(trimmed);
-                }
-            }
-        }
+        UciEngineOptions uciOptions = engineConfig.getUciConfig();
+        logger.info("initing the game engine with options: {}", uciOptions);
+        uciOptions.getOptions().forEach((name, value) -> {
+            String cmd = "setoption name " + name + " value " + value;
+            remote.send(cmd);
+        });
+        this.ponder = uciOptions.isPonder();
     }
 
     public Engine getAgentEntity() {
@@ -186,6 +204,7 @@ public class UciAgent implements IAgent {
     }
     
     enum State {
+        PONDERING,
         WAIT_FOR_UCI_OK,
         WAIT_FOR_READY_OK,
         WAIT_FOR_MOVE;

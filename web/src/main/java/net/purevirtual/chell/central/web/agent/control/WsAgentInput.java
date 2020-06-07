@@ -3,6 +3,8 @@ package net.purevirtual.chell.central.web.agent.control;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.websocket.RemoteEndpoint;
 import org.slf4j.Logger;
@@ -17,13 +19,18 @@ public class WsAgentInput implements AgentInput {
     }
     
     @Override
-    public void send(String... messages) {
+    public void send(List<String> messages) {
         for (String message : messages) {
             // we don't really care about result - if engine doesn't reply fast
             // enough or connections is dropped it will be killed and removed anyway
             logger.info("sending to agent : '{}'", message);
             remote.sendText(message);
         }
+    }
+  
+    @Override
+    public void send(String... messages) {
+        send(Arrays.asList(messages));
     }
 
     @Override

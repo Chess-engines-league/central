@@ -5,7 +5,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:jboss/datasources/ChellDS</jta-data-source>
         <properties>
-            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect" />
             <property name="hibernate.jdbc.batch_size" value="30"/>
         </properties>

@@ -33,7 +33,7 @@ public class ResultAndReason implements Serializable {
     public static ResultAndReason pending() {
         return new ResultAndReason(GameResult.PENDING, null);
     }
-    
+        
     public static ResultAndReason error() {
         return new ResultAndReason(GameResult.ERROR, null);
     }

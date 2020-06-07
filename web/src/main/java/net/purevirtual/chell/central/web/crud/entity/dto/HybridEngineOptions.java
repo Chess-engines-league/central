@@ -5,6 +5,13 @@ import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
 public class HybridEngineOptions {
     private HybridType type;
 
+    public HybridEngineOptions() {
+    }
+
+    public HybridEngineOptions(HybridType type) {
+        this.type = type;
+    }
+
     public HybridType getType() {
         return type;
     }

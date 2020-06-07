@@ -66,3 +66,14 @@ CREATE TABLE public.subengines (
 
 grant select,insert on "subengines" to jboss_chell_central;
 grant usage on "subengines_id_seq" to jboss_chell_central;
+
+
+CREATE TABLE "tournament" (
+    id  SERIAL NOT NULL,
+    config text NOT NULL,
+  	state text NOT NULL,
+	gamecount int4 NULL,
+    PRIMARY KEY (id)
+);
+grant select,insert,update on "tournament" to jboss_chell_central;
+grant usage on "tournamentid_seq" to jboss_chell_central;

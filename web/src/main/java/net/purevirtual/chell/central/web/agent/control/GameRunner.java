@@ -84,11 +84,13 @@ public class GameRunner {
                 resetW.get(10, TimeUnit.SECONDS);
             } catch (TimeoutException ex) {
                 logger.error("Failed to start game, can't reset white agent {}", game.getWhite());
+                return ResultAndReason.pending();
             }
             try {
                 resetB.get(10, TimeUnit.SECONDS);
             } catch (TimeoutException ex) {
                 logger.error("Failed to start game, can't reset black agent {}", game.getWhite());
+                return ResultAndReason.pending();
             }
             logger.info("agents resetted");
             for (int i = 1; i <= 2000; i++) {

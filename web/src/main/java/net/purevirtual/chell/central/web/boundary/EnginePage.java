@@ -26,6 +26,7 @@ import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.SubEnginesRelation;
+import net.purevirtual.chell.central.web.crud.entity.dto.HybridEngineOptions;
 import net.purevirtual.chell.central.web.crud.entity.enums.EngineType;
 import net.purevirtual.chell.central.web.crud.entity.enums.GamePhase;
 import net.purevirtual.chell.central.web.crud.entity.enums.HybridType;
@@ -144,7 +145,7 @@ public class EnginePage extends PageResource {
                 EngineConfig eg = new EngineConfig();
                 eg.setElo(1200);
                 eg.setEngine(engine);
-                eg.setInitOptions("{\"type\":\"" + type.name() + "\"}");
+                eg.setHybridConfig(new HybridEngineOptions(type));
                 eg.setDescription(type.name().toLowerCase());
                 engineConfigManager.save(eg);
             });
@@ -153,7 +154,7 @@ public class EnginePage extends PageResource {
             eg.setElo(1200);
             eg.setEngine(engine);
             eg.setDescription("default");
-            eg.setInitOptions("{\"type\":\"+PHASE+\"}");
+            eg.setHybridConfig(new HybridEngineOptions(HybridType.PHASE));
             engineConfigManager.save(eg);
         }
         // relative to /gui
