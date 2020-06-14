@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      >
+       
+    <h:head>
+        <title>New Tournament - Chell </title>
+    </h:head>
+    <body>
+        <p>New Tournament</p>
+        <h:form>
+            <h:panelGrid column="2">
+                <label>Game count for each match </label>
+                <h:inputText value="#{tournamentBean.gameCount}" />
+                <label>Time per game (seconds)</label>
+                <h:inputText value="#{tournamentBean.matchConfig.timePerGameS}" />
+                <label>Time per move (milliseconds)</label>
+                <h:inputText value="#{tournamentBean.matchConfig.timePerMoveMs}" />
+            </h:panelGrid>
+            <h:dataTable id="playerlist"  var="player" value="#{tournamentBean.players}">
+                <h:column >
+                    Participant
+                </h:column>
+                <h:column>
+                    <h:selectOneMenu value="#{player.engineId}">
+                        <f:selectItems value="#{tournamentBean.engines}" />
+                        <f:ajax render="engineConfigs" event="change" />
+                    </h:selectOneMenu>
+                </h:column>
+                <h:column>
+                    <h:selectManyListbox value="#{player.engineConfigIds}" immediate="true" id="engineConfigs">
+                        <f:selectItems value="#{tournamentBean.getEngineConfigs(player.engineId)}" />
+                    </h:selectManyListbox>
+                </h:column>
+            </h:dataTable>
+            <h:commandButton action="#{tournamentBean.addPlayer}" value="Add Player"/>
+            <h:commandButton action="#{tournamentBean.createNew}" type="submit" value="Start"/>
+        </h:form>
+    </body>
+</html>

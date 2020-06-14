@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="layout :: head"></th:block>
+        <title>New Match</title>
+    </head>
+    <body>
+        <div th:replace="layout :: navbar"></div>
+        <div class="container bg-secondary">
+            <h2>New Match</h2>
+            <form action="/gui/tournaments/new" method="POST" enctype="application/x-www-form-urlencoded">
+                <table id="formTable">
+                    <tr>
+                        <th>
+                            Games in match
+                        </th>
+                        <td colspan="2">
+                            <input name="games" type="number" min="2" max="100" value="8"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Time per move (miliseconds)</th>
+                        <td colspan="2">
+                            <input name="timePerMoveMs" type="number" min="1000" step="100" max="600000" value="1000"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Time per game (seconds)</th>
+                        <td colspan="2">
+                            <input name="timePerGameS" type="number" min="30" step="30" max="86400" value="1800"/>
+                        </td>
+                    </tr>
+                    
+                    
+                </table>
+                <button onclick="addEngine();return false" type="button">Add participant</button><br />
+                <button>Start</button>
+            </form>
+            <script type="text/javascript" >
+                function applyMoveSelectionType() {
+                    let type = document.querySelector('input[name="moveSelectionType"]:checked').value;
+                    if (type==='vote') {
+                        $('select.enginePhase').prop('disabled', 'disabled');
+                    } else {
+                        $('select.enginePhase').prop('disabled', false);
+                    }
+                }
+                
+                function saveIds(event) {
+                    var result=[];
+                    $(".engineConfig").each(function(index, elem ) {
+                       result.push($(elem).val());
+                    });
+                    console.log(result);
+                    $("[name=engineConfigIds]").val(result.join(";"));
+                    
+                    var phases=[];
+                    $(".enginePhase").each(function(index, elem ) {
+                       phases.push($(elem).val());
+                    });
+                    $("[name=enginePhases]").val(phases.join(";"));
+                    
+                    if(result.length>=2) {
+                        return true;
+                    } else {
+                        event.preventDefault();
+                        return false;
+                    }
+                }
+                var onEngineSelect = function(engine, engineConfig) {
+                    console.log(engine, engineConfig);
+                    engine.off('change').on("change", function() {
+                        engineConfig.empty();
+                        let id = engine.val();
+                        if(id){
+                            $.getJSON("/rest/engines/"+id+"/configs", function(data) {
+                                $.each(data,function(index,json){
+                                    engineConfig.append($("<option></option>").attr("value", json.id).text(json.name));
+                                });     
+                            })
+                        }
+                    });
+                    if(!engineConfig.val()) {
+                        // only required if not already loaded
+                        engine.trigger('change');
+                    }
+                };
+                function addEngine() {
+                    $.get("/gui/engines/fragment/subEngine", function(responseText) {
+                        let formTable = document.getElementById("formTable");
+                        var newRow = document.createElement('tr');
+                        formTable.appendChild(newRow);
+                        newRow.outerHTML = responseText;
+                        //applyMoveSelectionType();
+                        $.each($('#formTable tr'), function( i, row ) {
+                            var engine = $(row).find('.engine');
+                            var engineConfig = $(row).find('.engineConfig');
+                            if(engine.length===1 && engineConfig.length===1) {
+                                onEngineSelect(engine, engineConfig);
+                            }
+                            
+                        });
+                        
+                    });
+                }
+
+                addEngine();
+                addEngine();
+                $('input[name="moveSelectionType"]').on("change", applyMoveSelectionType);
+            </script>
+        </div>
+    </body>
+</html>

@@ -15,6 +15,7 @@ public class GuiRestConfig extends Application {
         classes.add(MatchPage.class);
         classes.add(GamePage.class);
         classes.add(EnginePage.class);
+        classes.add(TournamentPage.class);
         return classes;
     }
 

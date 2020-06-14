@@ -2,9 +2,7 @@ package net.purevirtual.chell.central.web.boundary;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -22,17 +20,19 @@ import net.purevirtual.chell.central.web.crud.control.EngineConfigManager;
 import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
+import net.purevirtual.chell.central.web.crud.control.TournamentManager;
 import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.Tournament;
 import net.purevirtual.chell.central.web.crud.entity.dto.MatchConfig;
 import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
 import org.thymeleaf.context.Context;
 
-@Path("/matches")
+@Path("/tournaments")
 @Produces(MediaType.TEXT_HTML)
-public class MatchPage extends PageResource {
+public class TournamentPage extends PageResource {
 
     
     @Inject
@@ -52,6 +52,9 @@ public class MatchPage extends PageResource {
     
     @Inject
     private MatchRunner matchRunner;
+    
+    @Inject
+    private TournamentManager tournamentManager;
 
     @GET
     @Path("/{matchId}")
@@ -90,7 +93,7 @@ public class MatchPage extends PageResource {
         context.put("player1", match.getPlayer1());
         context.put("player2", match.getPlayer2());
         context.put("games", games);
-        return getTemplateEngine().process("matches/match", new Context(null, context));
+        return getTemplateEngine().process("tournaments/match", new Context(null, context));
     }
     
     @GET
@@ -99,7 +102,7 @@ public class MatchPage extends PageResource {
         List<Engine> engines = engineManager.findAll();
         var context = newModel();
         context.put("engines", engines);
-        return getTemplateEngine().process("matches/new", new Context(null, context));
+        return getTemplateEngine().process("tournaments/new", new Context(null, context));
     }
     
     
@@ -121,17 +124,17 @@ public class MatchPage extends PageResource {
         Match match = matchMaker.newMatch(engine1, engine2, games, matchConfig, null);
         matchRunner.wake();
         // relative to /gui
-        return Response.temporaryRedirect(new URI("/matches/" + match.getId())).build();
+        return Response.temporaryRedirect(new URI("/tournaments/" + match.getId())).build();
     }
 
     
     @GET
     public String list() {
-        List<Match> matches = matchManager.findAll();
+        List<Tournament> tournaments = tournamentManager.findAll();
         var context = newModel();
 
-        context.put("matches", matches);
-        return getTemplateEngine().process("matches/list", new Context(null, context));
+        context.put("tournaments", tournaments);
+        return getTemplateEngine().process("tournaments/list", new Context(null, context));
     }
     
     private static class GameWithScore {

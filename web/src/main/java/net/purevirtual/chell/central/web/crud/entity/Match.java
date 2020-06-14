@@ -42,6 +42,10 @@ public class Match {
     @OrderBy("gameNumber ASC")
     private List<Game> games;
     
+    @ManyToOne
+    @JoinColumn(name = "idtournament")
+    private Tournament tournament;
+    
     @Enumerated(EnumType.STRING)
     private MatchState state;
     private String result;
@@ -132,4 +136,11 @@ public class Match {
         this.score2 = score2;
     }
 
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
+    }
 }

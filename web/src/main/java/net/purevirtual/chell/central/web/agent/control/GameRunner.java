@@ -139,6 +139,11 @@ public class GameRunner {
         boardState.setBoardMoves(game.getMoves());
         gameManager.updateBoardState(game.getGame(), boardState, moveDuration, side);
         logger.info("all moves after {} move: {}", side, game.getRawMoves());
+        //TODO: configure per match
+        int maximumMovesPerGame = 400;
+        if (game.getRawMoves().size() > maximumMovesPerGame) {
+            return Optional.of(new ResultAndReason(GameResult.DRAW, GameResultReason.MAX_MOVES_LIMIT));
+        }
         return isDone(game.getMovesString(), side);
     }
 

@@ -119,10 +119,11 @@ public class UciAgent implements IAgent {
         }
     } 
 
+    @Override
     public CompletableFuture<Void> reset(EngineConfig engineConfig) {
         state = State.WAIT_FOR_READY_OK;
         sendOptions(engineConfig);
-        remote.send("ucinewgame", "isready");
+        remote.send("stop", "ucinewgame", "isready");
         return readyFutures.addNew();
         
     }

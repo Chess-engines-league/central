@@ -76,4 +76,16 @@ CREATE TABLE "tournament" (
     PRIMARY KEY (id)
 );
 grant select,insert,update on "tournament" to jboss_chell_central;
-grant usage on "tournamentid_seq" to jboss_chell_central;
+grant usage on "tournament_id_seq" to jboss_chell_central;
+
+
+
+CREATE TABLE "tournamentparticipant" (
+    id  SERIAL NOT NULL,
+    idplayer int4 NOT NULL,
+  	idtournament int4 NOT NULL,
+	elo int4 NULL,
+    PRIMARY KEY (id)
+);
+grant select,insert,update on "tournamentparticipant" to jboss_chell_central;
+grant usage on "tournamentparticipant_id_seq" to jboss_chell_central;

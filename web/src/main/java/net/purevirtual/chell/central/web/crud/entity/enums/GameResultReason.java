@@ -8,5 +8,6 @@ public enum GameResultReason {
     STALEMATE,
     GAME_TIME_LIMIT,
     MOVE_TIME_LIMIT,
-    ILLEGAL_MOVE;
+    ILLEGAL_MOVE,
+    MAX_MOVES_LIMIT;
 }
