@@ -7,6 +7,8 @@ import com.github.bhlangonijr.chesslib.move.MoveGeneratorException;
 import com.github.bhlangonijr.chesslib.move.MoveList;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -151,6 +153,14 @@ public class GameRunner {
         MoveList list = new MoveList();
         list.loadFromText(len);
         String fen = list.getFen();
+        Map<String, Integer> counts = new HashMap<>();
+        for (int i=0;i<list.size();i++) {
+            String singleFen = list.getFen(i, false);
+            counts.compute(singleFen, (k,v)->v==null?1 :v+1);
+        }
+        if (counts.values().stream().anyMatch(c -> c >= 3)) {
+            return Optional.of(new ResultAndReason(GameResult.DRAW, GameResultReason.THREEFOLD_REPETITION));
+        }
         Board board = new Board();
         board.loadFromFen(fen);
         logger.info("fen: {}", fen);
