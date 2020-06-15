@@ -1,10 +1,16 @@
 @startuml
-' generate image with http://www.plantuml.com/plantuml/uml/
+' https://www.planttext.com/
 ' hide the spot
 hide circle
 
 ' avoid problems with angled crows feet
 'skinparam linetype ortho
+
+entity "User" as user {
+  *id : number <<generated>>
+  --
+  *login : text
+}
 
 entity "Engine" as engine {
   *id : number <<generated>>
@@ -20,7 +26,7 @@ entity "EngineConfig" as engineconfig {
   description : text
   elo:  number
   options: text (key=value list)
-  vote: enum (RANDOM)
+  vote: enum (RANDOM, VOTE, PHASE)
 }
 
 entity "Game" as game {
@@ -40,6 +46,14 @@ entity "Match" as match {
   startPosition: text
 }
 
+entity "Subengines" as sub {
+  *id : number <<generated>>
+  --
+  idengine : Engine <<FK>>
+  idsubengine : EngineConfig <<FK>>
+  phase: enum (OPENING, MIDDLEGAME, ENDGAME)
+}
+
 entity "Tournament" as tour {
   *id : number <<generated>>
   --
@@ -48,14 +62,22 @@ entity "Tournament" as tour {
   timePerMove: int
   timePerGame: int
   startPosition: text
-  type: enum RoundRobin/SingleElimination
 }
 
+entity "TournamentParticipant" as tourpart {
+  *id : number <<generated>>
+  --
+  idplayer : EngineConfig <<FK>>
+  idtournamnet : Tournament <<FK>>
 
+}
+
+tourpart }|--|| tour
+tourpart }|--|| engineconfig
 engineconfig }|--|| engine
 tour |o--|{ match
-engineconfig ||--o{ tour : x2
 engineconfig ||--o{ match : x2
 game }|--|| match
-engineconfig }o--|| engineconfig : hybrid subengine
+sub }o--o| engineconfig
+sub }o--o| engine
 @enduml

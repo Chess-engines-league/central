@@ -1,0 +1,24 @@
+@startuml
+
+title "Message exchanges"
+
+entity Engine
+boundary websocat
+boundary WebSocketEndPoint
+entity UciAgent
+entity HybridAgent
+control GameRunner
+database Games
+
+Engine <-> websocat : pipe
+websocat <-> WebSocketEndPoint : WebSocket
+WebSocketEndPoint -> UciAgent : onMessage
+UciAgent -> WebSocketEndPoint : send
+GameRunner -> UciAgent: <Future> getMove
+GameRunner <- UciAgent: <Future> complete
+GameRunner -> HybridAgent: <Future> getMove
+GameRunner <- HybridAgent: <Future> complete
+HybridAgent -> UciAgent: <Future> getMove
+HybridAgent <- UciAgent: <Future> complete
+GameRunner <-> Games : JPA
+@enduml

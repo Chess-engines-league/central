@@ -101,6 +101,9 @@ public class TournamentPage extends PageResource {
                 participant2.totalGames++;
             }
         }
+        participants = participants.stream()
+                .sorted(Comparator.comparing(ParticipantDTO::getElo).reversed().thenComparing(ParticipantDTO::getWins))
+                .collect(Collectors.toList());
         context.put("participants", participants);
         //
         return getTemplateEngine().process("tournaments/tournament", new Context(null, context));
@@ -154,6 +157,7 @@ public class TournamentPage extends PageResource {
         public int getTotalGames() {
             return totalGames;
         }
+        
         
         
         

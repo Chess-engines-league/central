@@ -55,6 +55,7 @@ public class TournamentTimer {
                         updateElo(match, participant2, newElo2);
                     }
                 }
+                tournament.setState(MatchState.FINISHED);
             }
         }
     }
