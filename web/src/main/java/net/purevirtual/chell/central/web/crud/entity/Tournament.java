@@ -1,9 +1,8 @@
 package net.purevirtual.chell.central.web.crud.entity;
 
 import com.google.gson.Gson;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,23 +19,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Entity
-public class Tournament {
+public class Tournament implements Serializable {
+
     private static final Logger logger = LoggerFactory.getLogger(Tournament.class);
-    
+
     @Id
     @SequenceGenerator(name = "tournament_id_seq", sequenceName = "tournament_id_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tournament_id_seq")
     @Column(updatable = false)
     private Integer id;
-    
+
     @OneToMany(mappedBy = "tournament")
-    private Set<Match> matched = new HashSet<>();
-    
+    private Set<Match> matches = new HashSet<>();
+    @OneToMany(mappedBy = "tournament")
+    private Set<TournamentParticipant> participants = new HashSet<>();
+
     @Enumerated(EnumType.STRING)
     private MatchState state;
     private String config;
     private int gameCount;
-  
+
     public Integer getId() {
         return id;
     }
@@ -52,9 +54,9 @@ public class Tournament {
     public void setState(MatchState state) {
         this.state = state;
     }
-    
+
     public MatchConfig getConfig() {
-        if(config==null || config.isBlank()) {
+        if (config == null || config.isBlank()) {
             return new MatchConfig();
         }
         return new Gson().fromJson(config, MatchConfig.class);
@@ -64,7 +66,6 @@ public class Tournament {
         this.config = new Gson().toJson(config);
     }
 
-
     public int getGameCount() {
         return gameCount;
     }
@@ -73,5 +74,12 @@ public class Tournament {
         this.gameCount = gameCount;
     }
 
-    
+    public Set<TournamentParticipant> getParticipants() {
+        return participants;
+    }
+
+    public Set<Match> getMatches() {
+        return matches;
+    }
+
 }

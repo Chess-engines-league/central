@@ -1,19 +1,16 @@
 package net.purevirtual.chell.central.web.boundary;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import net.purevirtual.chell.central.web.agent.bounduary.MatchRunner;
 import net.purevirtual.chell.central.web.agent.control.MatchMaker;
 import net.purevirtual.chell.central.web.crud.control.EngineConfigManager;
@@ -21,18 +18,19 @@ import net.purevirtual.chell.central.web.crud.control.EngineManager;
 import net.purevirtual.chell.central.web.crud.control.GameManager;
 import net.purevirtual.chell.central.web.crud.control.MatchManager;
 import net.purevirtual.chell.central.web.crud.control.TournamentManager;
-import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
 import net.purevirtual.chell.central.web.crud.entity.Tournament;
-import net.purevirtual.chell.central.web.crud.entity.dto.MatchConfig;
-import net.purevirtual.chell.central.web.crud.entity.enums.GameResult;
+import net.purevirtual.chell.central.web.crud.entity.TournamentParticipant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.thymeleaf.context.Context;
 
 @Path("/tournaments")
 @Produces(MediaType.TEXT_HTML)
 public class TournamentPage extends PageResource {
+    private static final Logger logger = LoggerFactory.getLogger(TournamentPage.class);
 
     
     @Inject
@@ -57,74 +55,55 @@ public class TournamentPage extends PageResource {
     private TournamentManager tournamentManager;
 
     @GET
-    @Path("/{matchId}")
-    public String get(@PathParam("matchId") int matchId) {
-        Match match = matchManager.get(matchId);
-        List<GameWithScore> games = gameManager.findByMatch(match).stream()
-                .map(game -> {
-                    String score1 = "";
-                    String score2 = "";
-                    if (game.getResult() == GameResult.WHITE) {
-                        if (game.isWhitePlayedByFirstAgent()) {
-                            score1 = "1";
-                            score2 = "0";
-                        } else {
-                            score1 = "0";
-                            score2 = "1";
-                        }
-                    }
-                    if (game.getResult() == GameResult.BLACK) {
-                        if (game.isWhitePlayedByFirstAgent()) {
-                            score1 = "0";
-                            score2 = "1";
-                        } else {
-                            score1 = "1";
-                            score2 = "0";
-                        }
-                    }
-                    if (game.getResult() == GameResult.DRAW) {
-                        score1 = "0.5";
-                        score2 = "0.5";
-                    }
-                    return new GameWithScore(game, score1, score2);
-                }).collect(Collectors.toList());
+    @Path("/{tournamentId}")
+    public String get(@PathParam("tournamentId") int tournamentId) {
+        Tournament tournament = tournamentManager.get(tournamentId);
         var context = newModel();
-        context.put("match", match);
-        context.put("player1", match.getPlayer1());
-        context.put("player2", match.getPlayer2());
-        context.put("games", games);
-        return getTemplateEngine().process("tournaments/match", new Context(null, context));
-    }
-    
-    @GET
-    @Path("/new")
-    public String newMatch() {
-        List<Engine> engines = engineManager.findAll();
-        var context = newModel();
-        context.put("engines", engines);
-        return getTemplateEngine().process("tournaments/new", new Context(null, context));
-    }
-    
-    
-    @POST
-    @Path("/new")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response newMatchSubmit(
-            @FormParam("engineConfig1") int engineConfig1,
-            @FormParam("engineConfig2") int engineConfig2,
-            @FormParam("games") int games,
-            @FormParam("timePerMoveMs") long timePerMoveMs,
-            @FormParam("timePerGameS") long timePerGameS
-            ) throws URISyntaxException {
-        EngineConfig engine1 = engineConfigManager.get(engineConfig1);
-        EngineConfig engine2 = engineConfigManager.get(engineConfig2);
-        MatchConfig matchConfig = new MatchConfig();
-        matchConfig.setTimePerMoveMs(timePerMoveMs);
-        matchConfig.setTimePerGameS(timePerGameS);
-        Match match = matchMaker.newMatch(engine1, engine2, games, matchConfig, null);
-        matchRunner.wake();
-        // relative to /gui
-        return Response.temporaryRedirect(new URI("/tournaments/" + match.getId())).build();
+        context.put("tournament", tournament);
+        List<Match> matches = matchManager.findByTournament(tournament);
+        context.put("matches", matches);
+        List<ParticipantDTO> participants = tournament.getParticipants().stream()
+                .map(ParticipantDTO::new)
+                .sorted(Comparator.comparing(ParticipantDTO::getElo).reversed())
+                .collect(Collectors.toList());
+        Map<Integer, ParticipantDTO> participantsByConfigId = participants
+                        .stream()
+                        .collect(Collectors.toMap(p->p.getPlayer().getId(), p->p));
+        for (Match match : matches) {
+                    ParticipantDTO participant1 = participantsByConfigId.get(match.getPlayer1().getId());
+                    ParticipantDTO participant2 = participantsByConfigId.get(match.getPlayer2().getId());
+            List<Game> games = gameManager.findByMatch(match);
+            for (Game game : games) {
+                logger.info("for game {} scores are {} and {}", game.getId(), game.getPlayer1Score(),game.getPlayer2Score());
+                switch (game.getPlayer1Score()) {
+                    case 0:
+                        participant1.loses++;
+                        break;
+                    case 1:
+                        participant1.draws++;
+                        break;
+                    case 2:
+                        participant1.wins++;
+                        break;
+                }
+                participant1.totalGames++;
+                switch (game.getPlayer2Score()) {
+                    case 0:
+                        participant2.loses++;
+                        break;
+                    case 1:
+                        participant2.draws++;
+                        break;
+                    case 2:
+                        participant2.wins++;
+                        break;
+                }
+                participant2.totalGames++;
+            }
+        }
+        context.put("participants", participants);
+        //
+        return getTemplateEngine().process("tournaments/tournament", new Context(null, context));
     }
 
     
@@ -136,17 +115,48 @@ public class TournamentPage extends PageResource {
         context.put("tournaments", tournaments);
         return getTemplateEngine().process("tournaments/list", new Context(null, context));
     }
+   
     
-    private static class GameWithScore {
-        public Game game;
-        public String score1;
-        public String score2;
+    private static class ParticipantDTO {
 
-        public GameWithScore(Game game, String score1, String score2) {
-            this.game = game;
-            this.score1 = score1;
-            this.score2 = score2;
+        private final int elo;
+        private final EngineConfig player;
+        private int wins = 0;
+        private int draws = 0;
+        private int loses = 0;
+        private int totalGames = 0;
+
+        public ParticipantDTO(TournamentParticipant tp) {
+            this.elo = tp.getElo();
+            this.player = tp.getPlayer();
         }
+
+        public int getElo() {
+            return elo;
+        }
+
+        public EngineConfig getPlayer() {
+            return player;
+        }
+
+        public int getWins() {
+            return wins;
+        }
+
+        public int getDraws() {
+            return draws;
+        }
+
+        public int getLoses() {
+            return loses;
+        }
+
+        public int getTotalGames() {
+            return totalGames;
+        }
+        
+        
+        
     }
     
 }

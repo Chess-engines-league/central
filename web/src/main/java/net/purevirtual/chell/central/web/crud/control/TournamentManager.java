@@ -18,7 +18,9 @@ public class TournamentManager {
     private EntityManager entityManager;
 
     public Tournament get(Integer id) {
-        return entityManager.find(Tournament.class, id);
+        return entityManager.createQuery("select t from Tournament t LEFT JOIN FETCH t.participants where t.id=:id", Tournament.class)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 
     public Tournament save(Tournament tournament) {
@@ -27,7 +29,7 @@ public class TournamentManager {
     }
 
     public List<Tournament> findUnfinished() {
-        return entityManager.createQuery("select distinct t from Tournament t  join FETCH m.games where m.state=:state", Tournament.class)
+        return entityManager.createQuery("select distinct t from Tournament t  join FETCH t.matches where t.state=:state", Tournament.class)
                 .setParameter("state", MatchState.PENDING)
                 .getResultList();
     }

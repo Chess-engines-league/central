@@ -4,8 +4,8 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.Tournament;
 import net.purevirtual.chell.central.web.crud.entity.enums.MatchState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +35,12 @@ public class MatchManager {
 
     public List<Match> findAll() {
         return entityManager.createQuery("select m from Match m order by m.id desc", Match.class)
+                .getResultList();
+    }
+    
+    public List<Match> findByTournament(Tournament tournament) {
+        return entityManager.createQuery("select m from Match m where m.tournament = :tournament order by m.id desc", Match.class)
+                .setParameter("tournament", tournament)
                 .getResultList();
     }
 

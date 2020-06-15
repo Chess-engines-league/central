@@ -2,15 +2,42 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <th:block th:replace="layout :: head"></th:block>
-        <title>Matches - Chess Engine League - Central Server</title>
+        <title>Tournament [[${tournament.id}]] - Chess Engine League</title>
     </head>
     <body>
         <div th:replace="layout :: navbar"></div>
-        <div>
-            <h3><a href="/gui/matches/new">New Match</a></h3>
-        </div>
-        <div class="container bg-secondary text-white">
-
+        <div class="container bg-secondary">
+            Tournament: <span />
+            <table>
+                <tr>
+                    <th>Time per move (ms)</th>
+                    <td th:text="${tournament.config.timePerMoveMs}" />
+                </tr>
+            </table>
+            <p >Status</p>
+            <p th:text="${tournament.state}" />
+            <p>Participants</p>
+            <table>
+                <tr>
+                    <th>description</th>
+                    <th>configuration</th>
+                    <th>tournament ELO</th>
+                    <th>Wins</th>
+                    <th>Draws</th>
+                    <th>Loses</th>
+                    <th>Total games</th>
+                </tr>
+                <tr th:each="participant: ${participants}">
+                    <td><a th:href="${'/gui/engines/'+ participant.player.engine.id}" th:text="${participant.player.engine.name+' ('+participant.player.engine.id+')'}"/></td>
+                    <td th:text="${participant.player.description}" />                    
+                    <td th:text="${participant.elo}" />
+                    <td th:text="${participant.wins}" />
+                    <td th:text="${participant.draws}" />
+                    <td th:text="${participant.loses}" />
+                    <td th:text="${participant.totalGames}" />
+                </tr>
+            </table>
+            Matches:
             <table>
                 <tr>
                     <th rowspan="2">ID</th>
@@ -39,6 +66,7 @@
             </table>    
 
 
+        
         </div>
     </body>
 </html>

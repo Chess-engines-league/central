@@ -11,6 +11,7 @@ import net.purevirtual.chell.central.web.crud.entity.Engine;
 import net.purevirtual.chell.central.web.crud.entity.EngineConfig;
 import net.purevirtual.chell.central.web.crud.entity.Game;
 import net.purevirtual.chell.central.web.crud.entity.Match;
+import net.purevirtual.chell.central.web.crud.entity.Tournament;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -58,6 +59,7 @@ public class TournamentPageTest {
         when(matchManager.get(any())).thenReturn(match);
         when(matchManager.findAll()).thenReturn(Collections.singletonList(match));
         when(gameManager.findByMatch(any())).thenReturn(Collections.singletonList(game));
+        when(tournamentManager.get(any())).thenReturn(new Tournament());
     }
     
     @Test
@@ -77,13 +79,5 @@ public class TournamentPageTest {
     }
     
         
-    @Test
-    public void testNewMatch() {
-        ArrayList<Engine> engines = new ArrayList<>();
-        engines.add(new Engine());
-        when(engineManager.findAll()).thenReturn(engines);
-        String result = sut.newMatch();
-        assertTrue(!result.isBlank());
-    }
     
 }
