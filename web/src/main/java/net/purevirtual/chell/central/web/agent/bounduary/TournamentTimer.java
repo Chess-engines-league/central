@@ -42,8 +42,8 @@ public class TournamentTimer {
                         TournamentParticipant participant2 = participantsByConfigId.get(match.getPlayer2().getId());
                         int elo1 = participant1.getElo();
                         int elo2 = participant2.getElo();
-                        double r1 = Math.pow(10, elo1/400);
-                        double r2 = Math.pow(10, elo2/400);
+                        double r1 = Math.pow(10, elo1/400.0);
+                        double r2 = Math.pow(10, elo2/400.0);
                         double e1 = r1 / (r1+r2);
                         double e2 = r2 / (r1+r2);
                         double s1 = 0.5d * match.getScore1() / match.getGameCount();

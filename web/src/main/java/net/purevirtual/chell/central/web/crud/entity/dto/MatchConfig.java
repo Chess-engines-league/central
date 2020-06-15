@@ -4,7 +4,7 @@ import java.time.Duration;
 
 public class MatchConfig {
     private long timePerMoveMs = 1000;
-    private long timePerGameS = 60 * 60 * 24;//24h
+    private long timePerGameS = 60 * 60 * 24L;//24h
 
     public long getTimePerMoveMs() {
         return timePerMoveMs;

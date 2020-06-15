@@ -66,8 +66,8 @@ public class MatchRunner {
         match.setScore2(match.getGames().stream().map(g->g.getPlayer2Score()).reduce(0, Integer::sum));
         int elo1 = match.getPlayer1().getElo();
         int elo2 = match.getPlayer2().getElo();
-        double r1 = Math.pow(10, elo1/400);
-        double r2 = Math.pow(10, elo2/400);
+        double r1 = Math.pow(10, elo1/400.0);
+        double r2 = Math.pow(10, elo2/400.0);
         double e1 = r1 / (r1+r2);
         double e2 = r2 / (r1+r2);
         double s1 = 0.5d * match.getScore1() / match.getGameCount();
